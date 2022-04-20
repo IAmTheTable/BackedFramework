@@ -4,9 +4,11 @@ global using System.Net.Sockets;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 
 using BackedFramework.Resources.Exceptions;
+using BackedFramework.Resources.HTTP;
 using Thread = BackedFramework.Resources.Extensions.Thread;
 
 namespace BackedFramework.Server
@@ -21,19 +23,19 @@ namespace BackedFramework.Server
         /// <summary>
         /// Configuration instance of the server.
         /// </summary>
-        public BackedConfig Config { get; set; }
+        public BackedConfig Config;
 
         /// <summary>
         /// Default constructor for creating the instance of the server.
         /// </summary>
         /// <param name="config">Configuration for the server</param>
         /// <exception cref="MultiInstanceException">Thrown when trying to create more than one instance of a BackedServer.</exception>
-        public BackedServer(BackedConfig config)
+        internal BackedServer(BackedConfig config)
         {
             // only allow a single instance of the server to exist
-            if(!Instance.Equals(null))
+            if (!Instance.Equals(null))
                 throw new MultiInstanceException("Only one instance of BackedServer can be created.");
-            
+
             // set our config and instance
             this.Config = config;
             Instance = this;
@@ -48,6 +50,8 @@ namespace BackedFramework.Server
             ConfigureServer();
         }
 
+        public static BackedServer Initialize(BackedConfig config) => new(config);
+
         /// <summary>
         /// Configure the TcpListener as well as start allowing connections to the server.
         /// </summary>
@@ -55,32 +59,54 @@ namespace BackedFramework.Server
         {
             this._server.Start();
 
-            new Thread(() =>
+            new Thread(async () =>
             {
-                while(true)
+                while (true)
                 {
                     if (!this._server.Pending())
                         continue;
 
-                    var client = this._server.AcceptTcpClient();
-                    Events.ServerEvents.ClientConnect.Invoke(client);
+                    var client = await this._server.AcceptTcpClientAsync();
+                    await Events.ServerEvents.InvokeClientConnect(client);
                 }
             }).Start();
         }
 
-        private async Task OnClientRequest()
+        private async Task OnClientRequest(TcpClient client, HTTPParser parser)
         {
-
+            RequestContext context = new(parser);
+            
+            await 
         }
 
-        private async Task OnClientConnect(TcpClient obj)
+        private async Task OnClientConnect(TcpClient client)
         {
-            
+            var clientStream = client.GetStream();
+
+            if (client.Available < 1)
+            {
+                await clientStream.DisposeAsync();
+                return;
+            }
+
+            // TODO: Add support for dynamic and static buffers
+            var buffer = new byte[client.Available];
+            var totalRead = await clientStream.ReadAsync(buffer);
+
+            // if we havent read all the data already, then continue to read the buffer.
+            if (totalRead != client.Available)
+            {
+                var nextToRead = client.Available - totalRead;
+                totalRead += await clientStream.ReadAsync(buffer, totalRead, nextToRead);
+            }
+
+            using HTTPParser parser = new(Encoding.UTF8.GetString(buffer));
+            await Events.ServerEvents.InvokeClientRequest(client, parser);
         }
 
         /// <summary>
         /// The server instance that will recieve and send requests...
         /// </summary>
-        private TcpListener _server;
+        private readonly TcpListener _server;
     }
 }

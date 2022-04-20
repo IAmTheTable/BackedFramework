@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BackedFramework.Resources.HTTP;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,6 +12,7 @@ namespace BackedFramework.Controllers
     /// </summary>
     public class BaseController
     {
-        
+        public ResponseContext Response;
+        public RequestContext Request;
     }
 }
