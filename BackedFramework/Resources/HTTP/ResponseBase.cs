@@ -2,23 +2,16 @@
 {
     public class ResponseBase
     {
-        private HTTPParser _parser;
+        private readonly HTTPParser _parser;
         internal ResponseBase(HTTPParser parser) { this._parser = parser; }
-        /// <summary>
-        /// The HTTP status code that the browser will recieve
-        /// </summary>
-        public HttpStatusCode Method
-        {
-            get => Enum.Parse<HttpStatusCode>(_parser.Method);
-            set => _parser.Method = value.ToString();
-        }
+
         /// <summary>
         /// The HTTP status code(number) that the browser will recieve.
         /// </summary>
-        public int StatusCode
+        public HttpStatusCode StatusCode
         {
-            get => (int)this.Method;
-            set => _parser.Code = value.ToString();
+            get => Enum.Parse<HttpStatusCode>(this._parser.Code);
+            set => this._parser.Code = value.ToString();
         }
 
         /// <summary>

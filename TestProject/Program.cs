@@ -29,7 +29,7 @@ namespace TestProject
         [Route("/home", BackedFramework.Resources.HTTP.HTTPMethods.GET)]
         public void func()
         {
-            
+            base.Response.Redirect("https://youtube.com");
         }
     }
 }
