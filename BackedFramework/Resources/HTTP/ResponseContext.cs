@@ -19,6 +19,10 @@ namespace BackedFramework.Resources.HTTP
         /// <remarks>Ex: https://youtube.com</remarks>
         public void Redirect(string location, HttpStatusCode code)
         {
+            if ((int)code < 300 || (int)code > 308)
+            {
+                throw new ArgumentException("The code must be a valid redirect code. See http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.3.2");
+            }
             base.StatusCode = HttpStatusCode.Found;
             base.Headers.Add("location", location);
         }
