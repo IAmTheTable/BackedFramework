@@ -7,7 +7,7 @@ namespace TestProject
     public class Program
     {
         public static void Main(string[] args)
-        {
+        {            
             BackedServer.Initialize(new()
             {
                 ApiPath = "/api",

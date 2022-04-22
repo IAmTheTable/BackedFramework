@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace BackedFramework.Resources.HTTP
 {
+    /// <summary>
+    /// A class that represents an HTTP response, but also provides simple yet helpful methods and properties to help build your response easier.
+    /// </summary>
     public class ResponseContext : ResponseBase
     {
         internal ResponseContext(HTTPParser parser) : base(parser)
@@ -13,11 +16,11 @@ namespace BackedFramework.Resources.HTTP
         }
 
         /// <summary>
-        /// Send a 302(Found) redirect request to the client.
+        /// Send a 3XX redirect type request to the client.
         /// </summary>
         /// <param name="location">The url the client will redirect to.</param>
         /// <remarks>Ex: https://youtube.com</remarks>
-        public void Redirect(string location, HttpStatusCode code)
+        public void Redirect(string location, HttpStatusCode code = HttpStatusCode.Redirect)
         {
             if ((int)code < 300 || (int)code > 308)
             {

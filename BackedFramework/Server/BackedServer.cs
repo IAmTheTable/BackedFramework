@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
-
+using BackedFramework.Api.Routing;
 using BackedFramework.Resources.Exceptions;
 using BackedFramework.Resources.HTTP;
 using Thread = BackedFramework.Resources.Extensions.Thread;
@@ -33,7 +33,7 @@ namespace BackedFramework.Server
         internal BackedServer(BackedConfig config)
         {
             // only allow a single instance of the server to exist
-            if (!Instance.Equals(null))
+            if (Instance is not null)
                 throw new MultiInstanceException("Only one instance of BackedServer can be created.");
 
             // set our config and instance
@@ -57,6 +57,15 @@ namespace BackedFramework.Server
         /// </summary>
         private void ConfigureServer()
         {
+            /*
+             * TODO: MAKE SURE TO CONFIGURE ALL THE SERVER EXTENSIONS
+             * EX; ROUTE MANAGER, CONNECTION MANAGER, THREAD MANAGER, ETC
+             */
+
+            // will be automatically disposed upon leaving the current scope
+            using var x = new RouteManager();
+
+            // start the server
             this._server.Start();
 
             new Thread(async () =>
@@ -74,34 +83,47 @@ namespace BackedFramework.Server
 
         private async Task OnClientRequest(TcpClient client, HTTPParser parser)
         {
-            RequestContext context = new(parser);
+            Console.WriteLine($"Current thread context: {System.Threading.Thread.CurrentThread.ManagedThreadId}");
+
+            RequestContext reqCtx = new(parser);
+            ResponseContext respCtx = new(parser);
+
             
-            await 
         }
 
         private async Task OnClientConnect(TcpClient client)
         {
-            var clientStream = client.GetStream();
-
-            if (client.Available < 1)
+            new Thread(async () =>
             {
-                await clientStream.DisposeAsync();
-                return;
-            }
+                var clientStream = client.GetStream();
 
-            // TODO: Add support for dynamic and static buffers
-            var buffer = new byte[client.Available];
-            var totalRead = await clientStream.ReadAsync(buffer);
+                if (client.Available < 1)
+                {
+                    await clientStream.DisposeAsync();
+                    return;
+                }
 
-            // if we havent read all the data already, then continue to read the buffer.
-            if (totalRead != client.Available)
-            {
-                var nextToRead = client.Available - totalRead;
-                totalRead += await clientStream.ReadAsync(buffer, totalRead, nextToRead);
-            }
+                new Resources.Extensions.Thread(() =>
+                {
+                    Console.WriteLine("hello world@!");
+                }).Start();
 
-            using HTTPParser parser = new(Encoding.UTF8.GetString(buffer));
-            await Events.ServerEvents.InvokeClientRequest(client, parser);
+                // TODO: Add support for dynamic and static buffers
+                var buffer = new byte[client.Available];
+                var totalRead = await clientStream.ReadAsync(buffer);
+
+                // if we havent read all the data already, then continue to read the buffer.
+                if (totalRead != client.Available)
+                {
+                    var nextToRead = client.Available - totalRead;
+                    totalRead += await clientStream.ReadAsync(buffer, totalRead, nextToRead);
+                }
+
+                Console.WriteLine($"Current thread context: {System.Threading.Thread.CurrentThread.ManagedThreadId}");
+
+                using HTTPParser parser = new(Encoding.UTF8.GetString(buffer));
+                await Events.ServerEvents.InvokeClientRequest(client, parser);
+            }).Start();
         }
 
         /// <summary>

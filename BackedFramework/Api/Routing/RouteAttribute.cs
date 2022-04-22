@@ -10,7 +10,7 @@ namespace BackedFramework.Api.Routing
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
     public class RouteAttribute : Attribute
     {
-        internal Dictionary<string, HTTPMethods[]> registeredRoutes = new();
+        internal static Dictionary<string, HTTPMethods[]> registeredRoutes = new();
 
         /// <summary>
         /// The route directory to match

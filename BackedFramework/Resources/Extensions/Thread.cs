@@ -9,8 +9,9 @@ namespace BackedFramework.Resources.Extensions
     /// <summary>
     /// An extended class wrapped around the System.Threading.Thread class to help ease of use with limiting thread counts.
     /// </summary>
-    internal class Thread
+    internal class Thread : IDisposable
     {
+        
         /// <summary>
         /// A list of threads that need to be executed.
         /// </summary>
@@ -53,5 +54,10 @@ namespace BackedFramework.Resources.Extensions
         /// Start the thread.
         /// </summary>
         public void Start() => _threadInstance.Start();
+        
+        void IDisposable.Dispose()
+        {
+            Console.WriteLine("thread is disposed");
+        }
     }
 }

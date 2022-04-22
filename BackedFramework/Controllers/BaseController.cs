@@ -12,7 +12,15 @@ namespace BackedFramework.Controllers
     /// </summary>
     public class BaseController
     {
-        public ResponseContext Response;
-        public RequestContext Request;
+        /// <summary>
+        /// An instance of a response context object.
+        /// </summary>
+        /// <seealso cref="ResponseContext"/>
+        public ResponseContext Response { get; internal set; }
+        /// <summary>
+        /// An instance of the request context the client sent.
+        /// </summary>
+        /// <seealso cref="RequestContext"/>
+        public RequestContext Request { get; internal set; }
     }
 }

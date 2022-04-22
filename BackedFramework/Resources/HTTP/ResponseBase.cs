@@ -1,5 +1,8 @@
 ﻿namespace BackedFramework.Resources.HTTP
 {
+    /// <summary>
+    /// A base class for HTTP server resources.
+    /// </summary>
     public class ResponseBase
     {
         private readonly HTTPParser _parser;
@@ -23,6 +26,9 @@
             set => _parser.Content = value;
         }
 
+        /// <summary>
+        /// A list of headers that will be sent to the browser.
+        /// </summary>
         public Dictionary<string, string> Headers
         {
             get => _parser.Headers;
