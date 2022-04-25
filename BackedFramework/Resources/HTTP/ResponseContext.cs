@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BackedFramework.Server;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,9 +12,17 @@ namespace BackedFramework.Resources.HTTP
     /// </summary>
     public class ResponseContext : ResponseBase
     {
-        internal ResponseContext(HTTPParser parser) : base(parser)
+        private TcpClient _client;
+        internal ResponseContext() : base(new())
         {
+            
         }
+
+        /// <summary>
+        /// A function to set the client, easier than constructing... might change later...
+        /// </summary>
+        /// <param name="client">Client instance</param>
+        internal void DefineClient(TcpClient client) => this._client = client;
 
         /// <summary>
         /// Send a 3XX redirect type request to the client.
@@ -27,13 +36,59 @@ namespace BackedFramework.Resources.HTTP
                 throw new ArgumentException("The code must be a valid redirect code. See http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.3.2");
             }
             base.StatusCode = HttpStatusCode.Found;
-            base.Headers.Add("location", location);
+            base.Headers.Add("Location", location);
+            base.Content = base.ToString();
+            this._client.GetStream().Write(base.ToBytes());
+            this._client.GetStream().Dispose();
         }
+
+        /// <summary>
+        /// Send a file to the client.
+        /// </summary>
+        /// <param name="fromBaseDirectory">Should the function look for the file in the defined root directory?</param>
+        /// <param name="path">Location of the file.</param>
+        public void SendFile(bool fromBaseDirectory, string path = "")
+        {
+            if (File.Exists(fromBaseDirectory == true ? BackedServer.Instance.Config.RootDirectory + path : path))
+            {
+                base.Content = File.ReadAllText(fromBaseDirectory == true ? BackedServer.Instance.Config.RootDirectory + path : path);
+            }
+            else
+            {
+                base.Content = "Request resource not found.";
+                base.StatusCode = HttpStatusCode.NotFound;
+            }
+            try
+            {
+                this._client.GetStream().Write(base.ToBytes());
+                this._client.GetStream().Dispose();
+            }
+            catch (InvalidOperationException)
+            {
+                throw new Exception("Attempted to finalize a request, but the request was already finalized.");
+            }
+            finally
+            {
+                GC.Collect();
+            }
+        }
+
         /// <summary>
         /// Write the response to the client.
         /// </summary>
         /// <param name="content">The string content to send.</param>
-        public void Write(string content) => base.Content = content;
+        public void Finalize()
+        {
+            this._client.GetStream().Write(base.ToBytes());
+            this._client.GetStream().Dispose();
+        }
+
+        /// <summary>
+        /// Add a header to the client.
+        /// </summary>
+        /// <param name="key">Name of the header.</param>
+        /// <param name="value">Value of the header.</param>
+        public void AddHeader(string key, string value) => base.Headers.Add(key, value);
 
         /// <summary>
         /// Send a Set-Cookie header to the client, which sets the cookie to its corresponding key=value pair.

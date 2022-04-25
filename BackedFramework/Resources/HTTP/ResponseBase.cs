@@ -14,7 +14,11 @@
         public HttpStatusCode StatusCode
         {
             get => Enum.Parse<HttpStatusCode>(this._parser.Code);
-            set => this._parser.Code = value.ToString();
+            set
+            {
+                this._parser.Code = ((int)value).ToString();
+                this._parser.Message = value.ToString();
+            }
         }
 
         /// <summary>
@@ -22,8 +26,8 @@
         /// </summary>
         public string Content
         {
-            get => _parser.Content;
-            set => _parser.Content = value;
+            get => this._parser.Content;
+            set => this._parser.Content = value;
         }
 
         /// <summary>
@@ -31,8 +35,11 @@
         /// </summary>
         public Dictionary<string, string> Headers
         {
-            get => _parser.Headers;
-            set => _parser.Headers = value;
+            get => this._parser.Headers;
+            set => this._parser.Headers = value;
         }
+
+        public byte[] ToBytes() => _parser.ToBytes();
+        public string ToString() => this._parser.ToString();
     }
 }

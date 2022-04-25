@@ -7,36 +7,61 @@ using System.Threading.Tasks;
 using System.Reflection;
 using BackedFramework.Controllers;
 using BackedFramework.Resources.HTTP;
+using BackedFramework.Server;
 
 namespace BackedFramework.Api.Routing
 {
-    // make sure this is an internal class
+    /// <summary>
+    /// A managing type class to help direct the request to the right route context controller.
+    /// </summary>
     internal class RouteManager : IDisposable
     {
         internal static RouteManager s_instance;
         /// <summary>
         /// A dictionary of all specified routes.
         /// </summary>
-        private Dictionary<RouteAttribute, Tuple<Type, MethodInfo>> _functionRoutes = new();
+        private readonly Dictionary<RouteAttribute, Tuple<Type, MethodInfo[]>> _functionRoutes = new();
 
         /// <summary>
         /// Default constructor for managing routes, will automatically scan the assembly for routes.
         /// </summary>
         internal RouteManager()
         {
-            if (s_instance is null)
+            if (s_instance is not null)
                 throw new Exception("Only one instance of RouteManager can be created, this could be a bug or you could be trying to create more than one instance.");
 
             // get the base application assembly
             var appBase = AppDomain.CurrentDomain.GetAssemblies().SelectMany(x => x.GetTypes()).Where(x => x.IsSubclassOf(typeof(BaseController)));
-            // iterate through ALL the modules.
+            // iterate through ALL the modules.(classes)
             foreach (var mod in appBase)
             {
-                // get the methods from the module
-                var extractedMethods = mod.GetMethods();
-                // iterate through the methods that contain our route attribute
-                foreach (var func in extractedMethods.Where(x => x.GetCustomAttribute<RouteAttribute>() != null))
-                    _functionRoutes.Add(func.GetCustomAttribute<RouteAttribute>(), Tuple.Create(mod, func)); // add the route to the dictionary
+                if (mod.GetCustomAttribute<RouteAttribute>() is not null)
+                {
+                    // add support for class based routing...
+                    foreach (var method in mod.GetMethods())
+                    {
+                        // make sure the function is user defined.
+                        if (method.IsGenericMethod || method.IsSpecialName || method.DeclaringType != mod)
+                            continue;
+
+                        // if the route has already been registered, append the new methods to the existing route.
+                        if (_functionRoutes.ContainsKey(mod.GetCustomAttribute<RouteAttribute>()))
+                        {
+                            // append the routes
+                            _functionRoutes[mod.GetCustomAttribute<RouteAttribute>()] = new Tuple<Type, MethodInfo[]>(mod, _functionRoutes[mod.GetCustomAttribute<RouteAttribute>()].Item2.Concat(new[] { method }).ToArray());
+                        }
+                        else
+                            _functionRoutes.Add(mod.GetCustomAttribute<RouteAttribute>(), new Tuple<Type, MethodInfo[]>(mod, new[] { method }));
+                    }
+                }
+                else
+                {
+                    // get the methods from the module
+                    var extractedMethods = mod.GetMethods();
+                    // iterate through the methods that contain our route attribute
+                    foreach (var func in extractedMethods.Where(x => x.GetCustomAttribute<RouteAttribute>() != null))
+                        _functionRoutes.Add(func.GetCustomAttribute<RouteAttribute>(), Tuple.Create(mod, new[] { func })); // add the route to the dictionary
+                }
             }
 
             // set the static instance
@@ -44,9 +69,14 @@ namespace BackedFramework.Api.Routing
         }
 
 
-        private bool TryExecuteRoute(string path, HTTPMethods method)
+        internal bool TryExecuteRoute(HTTPParser parser, ResponseContext rspCtx, RequestContext reqCtx)
         {
-            if (RouteAttribute.registeredRoutes[path] is not null)
+            // define used values
+            var fullpath = parser.Url;
+            var path = string.Join("/", parser.Url.Split("/").Take(parser.Url.Split("/").Length - 1)) == "" ? parser.Url : string.Join("/", parser.Url.Split("/").Take(parser.Url.Split("/").Length - 1));
+            var method = Enum.Parse<HTTPMethods>(parser.Method);
+
+            if (RouteAttribute.registeredRoutes.ContainsKey(path))
             {
                 // try and get the route from the function route directory.
                 var routeResult = _functionRoutes.Keys.Where(x => x.Route == path).ToList();
@@ -62,17 +92,86 @@ namespace BackedFramework.Api.Routing
                 var targetRouteFunc = _functionRoutes[route];
                 var targetRouteClass = targetRouteFunc.Item1;
 
-                var targetRouteClassInstance = targetRouteClass.GetMethod(".ctr").Invoke(null, new object[] { });
+                // create the controller
+                var controller = Activator.CreateInstance(targetRouteClass) as BaseController;
+                controller.Response = rspCtx;
+                controller.Request = reqCtx;
 
-                var responseField = targetRouteClass.GetField("Response");
-                var responseFieldInstance = responseField.
+                try
+                {
+                    // check if the route and path are the same, if so then return the index, if the index function is not present, then return 404.
+                    if(fullpath == route.Route)
+                    {
+                        var hasIndex = targetRouteFunc.Item2.ToList().Any(x => x.Name == "Index");
+                        if(!hasIndex)
+                        {
+                            // initialize and send the 404 response.
+                            rspCtx.StatusCode = HttpStatusCode.NotFound;
+                            rspCtx.Content = "The requested resource was not found.";
+                            rspCtx.Finalize();
+                            
+                            return true;
+                        }
+                        
+                        // invoke the Index function for the client to recieve.
+                        targetRouteClass.GetMethod("Index").Invoke(controller, Array.Empty<object>());
+                        return true;
+                    }
+                    else
+                    {
+                        // substring the path from the route to get the function name.
+                        var functionName = fullpath.Substring(route.Route.Length + 1);
+                        // check if the function exists, if not then return 404.
+                        if (!targetRouteFunc.Item2.ToList().Any(x => x.Name.ToLower() == functionName.ToLower()))
+                        {
+                            // initialize and send the 404 response.
+                            rspCtx.StatusCode = HttpStatusCode.NotFound;
+                            rspCtx.Content = "The requested resource was not found.";
+                            rspCtx.Finalize();
 
+                            return true;
+                        }
 
-                //todo: set the request context.
+                        //todo fix name casing.
 
-                _functionRoutes[route].Invoke(null, new object[] { });
+                        // execute the function because it exists
+                        targetRouteClass.GetMethod(functionName).Invoke(controller, Array.Empty<object>());
+                    }
+                    /*
+                    else
+                    {
+                        // find the relating function and invoke
+                        var targetRoute = targetRouteFunc.Item2.ToList().Find(x => x.Name == parser.Url.Split("/").Last()) ;
+                        targetRouteClass.GetMethod(targetRoute.Name).Invoke(controller, Array.Empty<object>());
+                    }*/
+                }
+                catch
+                {
+                    // maybe log this?
+                    return false;
+                }
+
+                return true;
+            }
+            else
+            {
+                if (File.Exists(BackedServer.Instance.Config.RootDirectory + "/" + path))
+                {
+                    // send the file
+                    rspCtx.SendFile(true, path);
+                    return true;
+                }
+                else
+                {
+                    // send 404
+                    rspCtx.StatusCode = HttpStatusCode.NotFound;
+                    rspCtx.Content = "The requested resource was not found.";
+
+                    return true;
+                }
             }
         }
+
 
         /// <summary>
         /// Only implementing to help free resources from inital instantiation.

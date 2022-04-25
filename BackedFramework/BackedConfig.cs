@@ -10,6 +10,12 @@
         /// </summary>
         /// <remarks>Example: "/api"</remarks>
         public string ApiPath { get; set; } = "/api";
+        
+        /// <summary>
+        /// The base directory to use when serving files.
+        /// </summary>
+        public string RootDirectory { get; set; } = "root";
+
         /// <summary>
         /// The default API version, doesnt have to be used, but still here for completeness.
         /// </summary>
@@ -77,6 +83,7 @@
             this.WriteBuffer = config.WriteBuffer;
             this.UseMultiThreading = config.UseMultiThreading;
             this.MaxThreads = config.MaxThreads;
+            this.RootDirectory = config.RootDirectory;
         }
     }
     

@@ -16,6 +16,16 @@ namespace BackedFramework.Server
     public class BackedServer
     {
         /// <summary>
+        /// Called when a client attempts to connect to the server.
+        /// </summary>
+        internal static event Func<TcpClient, Task> ClientConnect;
+
+        /// <summary>
+        /// Called when a valid request is made to the server from a client.
+        /// </summary>
+        internal static event Func<TcpClient, HTTPParser, Task> ClientRequest;
+
+        /// <summary>
         /// The static instance of the server.
         /// </summary>
         public static BackedServer Instance { get; private set; }
@@ -24,6 +34,11 @@ namespace BackedFramework.Server
         /// Configuration instance of the server.
         /// </summary>
         public BackedConfig Config;
+
+        /// <summary>
+        /// The server instance that will recieve and send requests...
+        /// </summary>
+        private readonly TcpListener _server;
 
         /// <summary>
         /// Default constructor for creating the instance of the server.
@@ -44,8 +59,8 @@ namespace BackedFramework.Server
             this._server = new(IPAddress.Any, this.Config.ListeningPort);
 
             // subscribe to the server events
-            Events.ServerEvents.ClientConnect += OnClientConnect;
-            Events.ServerEvents.ClientRequest += OnClientRequest;
+            ClientConnect += OnClientConnect;
+            ClientRequest += OnClientRequest;
 
             ConfigureServer();
         }
@@ -76,59 +91,70 @@ namespace BackedFramework.Server
                         continue;
 
                     var client = await this._server.AcceptTcpClientAsync();
-                    await Events.ServerEvents.InvokeClientConnect(client);
+                    await ClientConnect.Invoke(client);
                 }
             }).Start();
+            
+            System.Threading.Thread.Sleep(-1);
         }
-
-        private async Task OnClientRequest(TcpClient client, HTTPParser parser)
+        
+        private static async Task OnClientRequest(TcpClient client, HTTPParser parser)
         {
-            Console.WriteLine($"Current thread context: {System.Threading.Thread.CurrentThread.ManagedThreadId}");
+            Console.WriteLine($"Current thread context: {Environment.CurrentManagedThreadId}");
 
             RequestContext reqCtx = new(parser);
-            ResponseContext respCtx = new(parser);
+            ResponseContext rspCtx = new();
+            rspCtx.DefineClient(client); // set the client for the response context.
 
-            
+            if (!RouteManager.s_instance.TryExecuteRoute(parser, rspCtx, reqCtx))
+            {
+#if DEBUG
+                throw new Exception("failed to execute route...");
+#else
+                rspCtx.SetStatusCode(StatusCode.NotFound);
+                rspCtx.Content = "Requested Resource Not Found";
+#endif
+                // maybe log failed requests...
+            }
         }
 
-        private async Task OnClientConnect(TcpClient client)
+
+        /// <summary>
+        /// Called when a client connects to the server.
+        /// </summary>
+        /// <param name="client">The TcpClient instance of the client that connects to the server.</param>
+        /// <returns>None</returns>
+        /// TODO: Make sure to handle the threading...
+        private static async Task OnClientConnect(TcpClient client)
         {
+            Console.WriteLine($"Current thread context: {Environment.CurrentManagedThreadId}");
+
+            await Task.Delay(0);
             new Thread(async () =>
             {
                 var clientStream = client.GetStream();
-
                 if (client.Available < 1)
                 {
                     await clientStream.DisposeAsync();
                     return;
                 }
 
-                new Resources.Extensions.Thread(() =>
-                {
-                    Console.WriteLine("hello world@!");
-                }).Start();
-
                 // TODO: Add support for dynamic and static buffers
                 var buffer = new byte[client.Available];
                 var totalRead = await clientStream.ReadAsync(buffer);
 
                 // if we havent read all the data already, then continue to read the buffer.
-                if (totalRead != client.Available)
+                if (client.Available != 0)
                 {
                     var nextToRead = client.Available - totalRead;
-                    totalRead += await clientStream.ReadAsync(buffer, totalRead, nextToRead);
+                    totalRead += await clientStream.ReadAsync(buffer);
                 }
 
-                Console.WriteLine($"Current thread context: {System.Threading.Thread.CurrentThread.ManagedThreadId}");
+                Console.WriteLine($"Current thread context: {Environment.CurrentManagedThreadId}");
 
                 using HTTPParser parser = new(Encoding.UTF8.GetString(buffer));
-                await Events.ServerEvents.InvokeClientRequest(client, parser);
+                await ClientRequest.Invoke(client, parser);
             }).Start();
         }
-
-        /// <summary>
-        /// The server instance that will recieve and send requests...
-        /// </summary>
-        private readonly TcpListener _server;
     }
 }
