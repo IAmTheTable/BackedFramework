@@ -81,12 +81,16 @@ namespace BackedFramework.Api.Routing
                 // try and get the route from the function route directory.
                 var routeResult = _functionRoutes.Keys.Where(x => x.Route == path).ToList();
                 if (routeResult is null)
-                    return false;
+                {
+                    return true; // invalid request, handle later.
+                }
 
                 // if the route with code is not found just return false(failure)
                 RouteAttribute route;
                 if ((route = routeResult.Find(x => x.HTTPMethod == method && x.Route == path)) is null)
-                    return false;
+                {
+                    return true;// invalid request, handle later.
+                }
 
                 // the function that the route will use
                 var targetRouteFunc = _functionRoutes[route];
@@ -102,7 +106,7 @@ namespace BackedFramework.Api.Routing
                     // check if the route and path are the same, if so then return the index, if the index function is not present, then return 404.
                     if(fullpath == route.Route)
                     {
-                        var hasIndex = targetRouteFunc.Item2.ToList().Any(x => x.Name == "Index");
+                        var hasIndex = targetRouteFunc.Item2.ToList().Any(x => x.Name.ToLower() == "index");
                         if(!hasIndex)
                         {
                             // initialize and send the 404 response.
@@ -120,7 +124,18 @@ namespace BackedFramework.Api.Routing
                     else
                     {
                         // substring the path from the route to get the function name.
-                        var functionName = fullpath.Substring(route.Route.Length + 1);
+                        var functionName = fullpath[(route.Route.Length + 1)..];
+
+                        // check if we have a routed function, if not just run the default one, let it be known to prioritize the routed functions over the class implemented ones.
+                        if (targetRouteFunc.Item2.ToList().Exists(x => x.CustomAttributes.Any() && x.GetCustomAttribute<RouteAttribute>().Route == $"/{functionName}"))
+                        {
+                            var functions = targetRouteFunc.Item2.ToList();
+                            var targFuncName = $"/{functionName}";
+                            var targetFunc = functions.Find(x => x.CustomAttributes.Any() && x.GetCustomAttribute<RouteAttribute>().Route == targFuncName);
+                            targetFunc.Invoke(controller, Array.Empty<object>());
+                            return true;
+                        }
+
                         // check if the function exists, if not then return 404.
                         if (!targetRouteFunc.Item2.ToList().Any(x => x.Name.ToLower() == functionName.ToLower()))
                         {
@@ -132,18 +147,9 @@ namespace BackedFramework.Api.Routing
                             return true;
                         }
 
-                        //todo fix name casing.
-
-                        // execute the function because it exists
-                        targetRouteClass.GetMethod(functionName).Invoke(controller, Array.Empty<object>());
+                        // execute the default function.
+                        targetRouteFunc.Item2.ToList().Find(x => x.Name.ToLower() == functionName.ToLower()).Invoke(controller, Array.Empty<object>());
                     }
-                    /*
-                    else
-                    {
-                        // find the relating function and invoke
-                        var targetRoute = targetRouteFunc.Item2.ToList().Find(x => x.Name == parser.Url.Split("/").Last()) ;
-                        targetRouteClass.GetMethod(targetRoute.Name).Invoke(controller, Array.Empty<object>());
-                    }*/
                 }
                 catch
                 {
