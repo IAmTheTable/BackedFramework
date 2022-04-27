@@ -30,7 +30,7 @@ namespace TestProject
         [Route("/home", BackedFramework.Resources.HTTP.HTTPMethods.GET)]
         public void Func()
         {
-            base.Response.SendFile(true, "what");
+            base.Response.SendFile(true, "what"); 
         }
     }
 
@@ -44,7 +44,7 @@ namespace TestProject
         {
             base.Response.SendFile(true, "index.html");
         }
-
+        
         public void NotIndex()
         {
             base.Response.Content = "Not Hello World.";
@@ -54,9 +54,7 @@ namespace TestProject
         [Route("/notadmin", BackedFramework.Resources.HTTP.HTTPMethods.POST)]
         public void admin()
         {
-            base.Response.StatusCode = System.Net.HttpStatusCode.NotAcceptable;
-            base.Response.Content = "this is the administrator page.";
-            base.Response.Finalize();
+            base.Response.SendFile(true, "index.html");
         }
     }
 }

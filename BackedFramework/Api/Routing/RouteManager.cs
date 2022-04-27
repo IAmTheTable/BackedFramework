@@ -75,6 +75,7 @@ namespace BackedFramework.Api.Routing
             var fullpath = parser.Url;
             var path = string.Join("/", parser.Url.Split("/").Take(parser.Url.Split("/").Length - 1)) == "" ? parser.Url : string.Join("/", parser.Url.Split("/").Take(parser.Url.Split("/").Length - 1));
             var method = Enum.Parse<HTTPMethods>(parser.Method);
+            var subpath = fullpath.Substring(path.Length);
 
             if (RouteAttribute.registeredRoutes.ContainsKey(path))
             {
@@ -85,9 +86,14 @@ namespace BackedFramework.Api.Routing
                     return true; // invalid request, handle later.
                 }
 
+
+                // NOTES: Small bug that it wont actually like, find the proper path and method in relation to the function that is being called,
+                // - so it will just return without closing the connection properly.
+                // - to fix just, be better at finding the proper path and method. - or just be better :troll:
+
                 // if the route with code is not found just return false(failure)
-                RouteAttribute route;
-                if ((route = routeResult.Find(x => x.HTTPMethod == method && x.Route == path)) is null)
+                RouteAttribute route = routeResult.Find(x => x.HTTPMethod == method && x.Route == subpath);
+                if (route is null)
                 {
                     return true;// invalid request, handle later.
                 }
