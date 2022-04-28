@@ -40,6 +40,6 @@
         }
 
         public byte[] ToBytes() => _parser.ToBytes();
-        public string ToString() => this._parser.ToString();
+        public override string ToString() => this._parser.ToString();
     }
 }

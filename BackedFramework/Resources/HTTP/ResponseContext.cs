@@ -15,7 +15,7 @@ namespace BackedFramework.Resources.HTTP
         private TcpClient _client;
         internal ResponseContext() : base(new())
         {
-            
+            base.Headers.Add("BackedFramework Version", BackedServer.Instance.Config.ApiVersion);
         }
 
         /// <summary>
@@ -49,15 +49,38 @@ namespace BackedFramework.Resources.HTTP
         /// <param name="path">Location of the file.</param>
         public void SendFile(bool fromBaseDirectory, string path = "")
         {
-            if (File.Exists(fromBaseDirectory == true ? BackedServer.Instance.Config.RootDirectory + path : path))
+            if (File.Exists(fromBaseDirectory == true ? BackedServer.Instance.Config.RootDirectory + "/" + path : path))
             {
-                base.Content = File.ReadAllText(fromBaseDirectory == true ? BackedServer.Instance.Config.RootDirectory + path : path);
+                base.Content = File.ReadAllText(fromBaseDirectory == true ? BackedServer.Instance.Config.RootDirectory + "/" + path : path);
             }
             else
             {
                 base.Content = "Request resource not found.";
                 base.StatusCode = HttpStatusCode.NotFound;
             }
+            try
+            {
+                this._client.GetStream().Write(base.ToBytes());
+                this._client.GetStream().Dispose();
+            }
+            catch (InvalidOperationException)
+            {
+                throw new Exception("Attempted to finalize a request, but the request was already finalized.");
+            }
+            finally
+            {
+                GC.Collect();
+            }
+        }
+
+        /// <summary>
+        /// A pre-written function to help send a 404 response to the client.
+        /// </summary>
+        /// <exception cref="Exception">Thrown when the client has already been sent a response or the client's stream is invalid.</exception>
+        public void SendNotFound()
+        {
+            base.Content = "Request resource not found.";
+            base.StatusCode = HttpStatusCode.NotFound;
             try
             {
                 this._client.GetStream().Write(base.ToBytes());
@@ -81,6 +104,8 @@ namespace BackedFramework.Resources.HTTP
         {
             this._client.GetStream().Write(base.ToBytes());
             this._client.GetStream().Dispose();
+
+            GC.Collect();
         }
 
         /// <summary>

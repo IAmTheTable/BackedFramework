@@ -75,28 +75,23 @@ namespace BackedFramework.Api.Routing
             var fullpath = parser.Url;
             var path = string.Join("/", parser.Url.Split("/").Take(parser.Url.Split("/").Length - 1)) == "" ? parser.Url : string.Join("/", parser.Url.Split("/").Take(parser.Url.Split("/").Length - 1));
             var method = Enum.Parse<HTTPMethods>(parser.Method);
-            var subpath = fullpath.Substring(path.Length);
+            var subpath = fullpath[path.Length..];
 
             if (RouteAttribute.registeredRoutes.ContainsKey(path))
             {
                 // try and get the route from the function route directory.
-                var routeResult = _functionRoutes.Keys.Where(x => x.Route == path).ToList();
+                var routeResult = _functionRoutes.Keys.Where(x => x.HTTPMethod == method && x.Route == path).ToList();
                 if (routeResult is null)
                 {
+                    rspCtx.SendNotFound();
                     return true; // invalid request, handle later.
                 }
-
 
                 // NOTES: Small bug that it wont actually like, find the proper path and method in relation to the function that is being called,
                 // - so it will just return without closing the connection properly.
                 // - to fix just, be better at finding the proper path and method. - or just be better :troll:
 
-                // if the route with code is not found just return false(failure)
-                RouteAttribute route = routeResult.Find(x => x.HTTPMethod == method && x.Route == subpath);
-                if (route is null)
-                {
-                    return true;// invalid request, handle later.
-                }
+                var route = routeResult.First();
 
                 // the function that the route will use
                 var targetRouteFunc = _functionRoutes[route];
@@ -115,11 +110,8 @@ namespace BackedFramework.Api.Routing
                         var hasIndex = targetRouteFunc.Item2.ToList().Any(x => x.Name.ToLower() == "index");
                         if(!hasIndex)
                         {
-                            // initialize and send the 404 response.
-                            rspCtx.StatusCode = HttpStatusCode.NotFound;
-                            rspCtx.Content = "The requested resource was not found.";
-                            rspCtx.Finalize();
-                            
+                            // send the 404
+                            rspCtx.SendNotFound();
                             return true;
                         }
                         
@@ -145,11 +137,8 @@ namespace BackedFramework.Api.Routing
                         // check if the function exists, if not then return 404.
                         if (!targetRouteFunc.Item2.ToList().Any(x => x.Name.ToLower() == functionName.ToLower()))
                         {
-                            // initialize and send the 404 response.
-                            rspCtx.StatusCode = HttpStatusCode.NotFound;
-                            rspCtx.Content = "The requested resource was not found.";
-                            rspCtx.Finalize();
-
+                            // send the 404
+                            rspCtx.SendNotFound();
                             return true;
                         }
 
@@ -175,10 +164,8 @@ namespace BackedFramework.Api.Routing
                 }
                 else
                 {
-                    // send 404
-                    rspCtx.StatusCode = HttpStatusCode.NotFound;
-                    rspCtx.Content = "The requested resource was not found.";
-
+                    // send the 404
+                    rspCtx.SendNotFound();
                     return true;
                 }
             }
