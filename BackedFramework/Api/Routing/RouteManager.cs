@@ -8,6 +8,7 @@ using System.Reflection;
 using BackedFramework.Controllers;
 using BackedFramework.Resources.HTTP;
 using BackedFramework.Server;
+using BackedFramework.Resources.Exceptions;
 
 namespace BackedFramework.Api.Routing
 {
@@ -28,7 +29,7 @@ namespace BackedFramework.Api.Routing
         internal RouteManager()
         {
             if (s_instance is not null)
-                throw new Exception("Only one instance of RouteManager can be created, this could be a bug or you could be trying to create more than one instance.");
+                throw new MultiInstanceException("Only one instance of RouteManager can be created, this could be a bug or you could be trying to create more than one instance.");
 
             // get the base application assembly
             var appBase = AppDomain.CurrentDomain.GetAssemblies().SelectMany(x => x.GetTypes()).Where(x => x.IsSubclassOf(typeof(BaseController)));
@@ -91,6 +92,9 @@ namespace BackedFramework.Api.Routing
                 // - so it will just return without closing the connection properly.
                 // - to fix just, be better at finding the proper path and method. - or just be better :troll:
 
+
+                // NOTES: I need to fix detecting proper routes, using a better method
+
                 var route = routeResult.First();
 
                 // the function that the route will use
@@ -131,6 +135,14 @@ namespace BackedFramework.Api.Routing
                             var targFuncName = $"/{functionName}";
                             var targetFunc = functions.Find(x => x.CustomAttributes.Any() && x.GetCustomAttribute<RouteAttribute>().Route == targFuncName);
                             targetFunc.Invoke(controller, Array.Empty<object>());
+                            return true;
+                        }
+
+                        // wont lie, this might be a security issue, and a small bug, but it will be fixed later.
+                        if (targetRouteFunc.Item2.Length == 1)
+                        {
+                            // invoke the function
+                            targetRouteFunc.Item2[0].Invoke(controller, Array.Empty<object>());
                             return true;
                         }
 

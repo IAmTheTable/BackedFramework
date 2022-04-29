@@ -36,7 +36,7 @@ namespace BackedFramework.Api.Routing
             {
                 if (registeredRoutes[targetRoute].Contains(method))
                 {
-                    Console.WriteLine($"The route {targetRoute} has already been registered with the method {method}");
+                    //Console.WriteLine($"The route {targetRoute} has already been registered with the method {method}");
                 }
                 else
                     registeredRoutes[targetRoute] = registeredRoutes[targetRoute].Concat(new[] { method }).ToArray();

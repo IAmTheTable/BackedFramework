@@ -9,6 +9,7 @@ using System.Text;
 using BackedFramework.Api.Routing;
 using BackedFramework.Resources.Exceptions;
 using BackedFramework.Resources.HTTP;
+using BackedFramework.Resources.Statistics;
 using Thread = BackedFramework.Resources.Extensions.Thread;
 
 namespace BackedFramework.Server
@@ -100,7 +101,7 @@ namespace BackedFramework.Server
         
         private static async Task OnClientRequest(TcpClient client, HTTPParser parser)
         {
-            Console.WriteLine($"Current thread context: {Environment.CurrentManagedThreadId}");
+            //Console.WriteLine($"Current thread context: {Environment.CurrentManagedThreadId}");
 
             RequestContext reqCtx = new(parser);
             ResponseContext rspCtx = new();
@@ -127,8 +128,8 @@ namespace BackedFramework.Server
         /// TODO: Make sure to handle the threading...
         private static async Task OnClientConnect(TcpClient client)
         {
-            Console.WriteLine($"Current thread context: {Environment.CurrentManagedThreadId}");
-
+            //Console.WriteLine($"Current thread context: {Environment.CurrentManagedThreadId}");
+            using StatisticsManager statManager = new();
             await Task.Delay(0);
             new Thread(async () =>
             {
@@ -139,18 +140,32 @@ namespace BackedFramework.Server
                     return;
                 }
 
-                // TODO: Add support for dynamic and static buffers
-                var buffer = new byte[client.Available];
+                // determine the buffer size per request
+                var bufferSize = Instance.Config.DynamicBuffers ? client.Available : Instance.Config.ReadBuffer;
+#if DEBUG
+                statManager.Start(); // get statistics
+#endif
+                // allocate the buffer
+                var buffer = new byte[bufferSize];
                 var totalRead = await clientStream.ReadAsync(buffer);
 
                 // if we havent read all the data already, then continue to read the buffer.
+                readData:
                 if (client.Available != 0)
                 {
                     var nextToRead = client.Available - totalRead;
-                    totalRead += await clientStream.ReadAsync(buffer);
+                    var oldRead = totalRead;
+                    Array.Resize(ref buffer, buffer.Length + bufferSize);
+                    totalRead += await clientStream.ReadAsync(buffer, oldRead, bufferSize);
+                    goto readData;
                 }
+                Array.Resize(ref buffer, totalRead);
 
-                Console.WriteLine($"Current thread context: {Environment.CurrentManagedThreadId}");
+#if DEBUG
+                //Console.WriteLine($"Current thread context: {Environment.CurrentManagedThreadId}");
+                statManager.End();
+                statManager.PrintTiming();
+#endif
 
                 using HTTPParser parser = new(Encoding.UTF8.GetString(buffer));
                 await ClientRequest.Invoke(client, parser);

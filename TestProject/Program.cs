@@ -11,22 +11,32 @@ namespace TestProject
             BackedServer.Initialize(new()
             {
                 ApiPath = "/api",
-
                 ListeningPort = 80,
                 ApiVersion = "v4.20",
-                RootDirectory = "root",
+                RootDirectory = @"C:\Users\asanc052\Desktop\Work\FamilyWebsite\School_HtmlFamilyProject",
                 UseMultiThreading = true,
                 MaxThreads = -1,
-                DynamicBuffers = true
+                DynamicBuffers = false,
+                ReadBuffer = 10,
+                WriteBuffer = 10,
             });
-
-            BackedServer.Instance.Config.ReadBuffer = 9;
         }
     }
 
-
-    public class Index : BaseController
+    public class Base : BaseController
     {
+        [Route("/", BackedFramework.Resources.HTTP.HTTPMethods.GET)]
+        public void Index()
+        {
+            base.Response.SendFile(true, "index.html");
+        }
+        
+        [Route("/img", BackedFramework.Resources.HTTP.HTTPMethods.GET)]
+        public void ImageRequest()
+        {
+            base.Response.SendRawFile(true, $"{base.Request.Path}");
+        }
+
         [Route("/home", BackedFramework.Resources.HTTP.HTTPMethods.GET)]
         public void Func()
         {

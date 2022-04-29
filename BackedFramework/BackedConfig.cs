@@ -39,12 +39,12 @@
         /// </summary>
         public bool DynamicBuffers { get; set; } = true;
         /// <summary>
-        /// The max amount of data that the server can recieve in a single request.
+        /// The max amount of data (in bytes) that the server can recieve in a single request.
         /// </summary>
         /// <remarks>[!] Will not be used if dynamic buffers are enabled.</remarks>
         public int ReadBuffer { get; set; } = 4096;
         /// <summary>
-        /// The max amount of data that the server can send in a single request.
+        /// The max amount of data (in bytes)  that the server can send in a single request.
         /// </summary>
         /// <remarks>[!] Will not be used if dynamic buffers are enabled.</remarks>
         public int WriteBuffer { get; set; } = 4096;
@@ -86,5 +86,4 @@
             this.RootDirectory = config.RootDirectory;
         }
     }
-    
 }
