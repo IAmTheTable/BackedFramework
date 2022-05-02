@@ -1,4 +1,5 @@
-﻿using BackedFramework.Server;
+﻿using BackedFramework.Resources.Logging;
+using BackedFramework.Server;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,9 +13,12 @@ namespace BackedFramework.Resources.HTTP
     /// </summary>
     public class ResponseContext : ResponseBase, IDisposable
     {
+        private static int _instanceCount = 0;
         private TcpClient _client;
         internal ResponseContext() : base(new())
         {
+            Console.WriteLine("Created response context");
+            _instanceCount++;
             base.Headers.Add("BackedFramework Version", BackedServer.Instance.Config.ApiVersion);
         }
 
@@ -52,13 +56,18 @@ namespace BackedFramework.Resources.HTTP
                 if (dataLeft != 0)
                     goto writeData;
 
-                await this._client.GetStream().DisposeAsync();
+                if (base.Headers.ContainsKey("Connection"))
+                    if (base.Headers["Connection"] != "keep-alive")
+                        await this._client.GetStream().DisposeAsync();
+
                 this.Dispose();
                 return;
             }
             // write data to client
             await this._client.GetStream().WriteAsync(dataToSend);
-            await this._client.GetStream().DisposeAsync();
+            if (base.Headers.ContainsKey("Connection"))
+                if (base.Headers["Connection"] != "keep-alive")
+                    await this._client.GetStream().DisposeAsync();
             this.Dispose();
         }
 
@@ -93,14 +102,16 @@ namespace BackedFramework.Resources.HTTP
                     if (dataLeft != 0)
                         goto writeData;
 
-                    await this._client.GetStream().DisposeAsync();
-                    this.Dispose();
+                    if (base.Headers.ContainsKey("Connection"))
+                        if (base.Headers["Connection"] != "keep-alive")
+                            await this._client.GetStream().DisposeAsync(); this.Dispose();
                     return;
                 }
                 // write data to client
                 await this._client.GetStream().WriteAsync(dataToSend);
-                await this._client.GetStream().DisposeAsync();
-                this.Dispose();
+                if (base.Headers.ContainsKey("Connection"))
+                    if (base.Headers["Connection"] != "keep-alive")
+                        await this._client.GetStream().DisposeAsync(); this.Dispose();
             }
             catch (InvalidOperationException)
             {
@@ -109,6 +120,7 @@ namespace BackedFramework.Resources.HTTP
             finally
             {
                 GC.Collect();
+
             }
         }
 
@@ -151,13 +163,17 @@ namespace BackedFramework.Resources.HTTP
                             totalSent += dataLeft < BackedServer.Instance.Config.WriteBuffer ? dataLeft : BackedServer.Instance.Config.WriteBuffer;
                             if (dataLeft != 0)
                                 goto writeData;
-                            await this._client.GetStream().DisposeAsync();
+                            if (base.Headers.ContainsKey("Connection"))
+                                if (base.Headers["Connection"] != "keep-alive")
+                                    await this._client.GetStream().DisposeAsync();
                             this.Dispose();
                             return;
                         }
                         // write data to client
                         await this._client.GetStream().WriteAsync(dataToSend);
-                        await this._client.GetStream().DisposeAsync();
+                        if (base.Headers.ContainsKey("Connection"))
+                            if (base.Headers["Connection"] != "keep-alive")
+                                await this._client.GetStream().DisposeAsync();
                         this.Dispose();
                         return;
                     }
@@ -168,6 +184,7 @@ namespace BackedFramework.Resources.HTTP
                     finally
                     {
                         GC.Collect();
+
                     }
                 }
                 // if we have fixed buffers, use them.
@@ -178,18 +195,35 @@ namespace BackedFramework.Resources.HTTP
                     int dataLeft = data.Length;
                 writeData:
                     dataLeft = data.Length - totalSent;
-                    await this._client.GetStream().WriteAsync(data, totalSent, dataLeft < BackedServer.Instance.Config.WriteBuffer ? dataLeft : BackedServer.Instance.Config.WriteBuffer);
+                    try
+                    {
+                        await this._client.GetStream().WriteAsync(data, totalSent, dataLeft < BackedServer.Instance.Config.WriteBuffer ? dataLeft : BackedServer.Instance.Config.WriteBuffer);
+                    }
+                    catch (IOException)
+                    {
+                        Console.WriteLine("Failed to finish writing to the client.");
+                    }
                     totalSent += dataLeft < BackedServer.Instance.Config.WriteBuffer ? dataLeft : BackedServer.Instance.Config.WriteBuffer;
                     if (dataLeft != 0)
                         goto writeData;
-                    await this._client.GetStream().DisposeAsync();
+                    if (base.Headers.ContainsKey("Connection"))
+                        if (base.Headers["Connection"] != "keep-alive")
+                            await this._client.GetStream().DisposeAsync();
                     return;
                 }
 
                 // send the data to the client
-                await this._client.GetStream().WriteAsync(data);
-                await this._client.GetStream().DisposeAsync();
-
+                try
+                {
+                    await this._client.GetStream().WriteAsync(data);
+                }
+                catch (IOException)
+                {
+                    Logger.Log(Logger.LogLevel.Error, "Failed to finish writing to the client.");
+                }
+                if (base.Headers.ContainsKey("Connection"))
+                    if (base.Headers["Connection"] != "keep-alive")
+                        await this._client.GetStream().DisposeAsync();
                 this.Dispose();
             }
             catch (InvalidOperationException)
@@ -199,6 +233,7 @@ namespace BackedFramework.Resources.HTTP
             finally
             {
                 GC.Collect();
+
             }
         }
 
@@ -224,13 +259,20 @@ namespace BackedFramework.Resources.HTTP
                     totalSent += dataLeft < BackedServer.Instance.Config.WriteBuffer ? dataLeft : BackedServer.Instance.Config.WriteBuffer;
                     if (dataLeft != 0)
                         goto writeData;
-                    await this._client.GetStream().DisposeAsync();
+
+                    if (base.Headers.ContainsKey("Connection"))
+                        if (base.Headers["Connection"] != "keep-alive")
+                            await this._client.GetStream().DisposeAsync();
+
                     this.Dispose();
                     return;
                 }
                 // write data to client
                 await this._client.GetStream().WriteAsync(dataToSend);
-                await this._client.GetStream().DisposeAsync();
+                if (base.Headers.ContainsKey("Connection"))
+                    if (base.Headers["Connection"] != "keep-alive")
+                        await this._client.GetStream().DisposeAsync();
+
                 this.Dispose();
             }
             catch (InvalidOperationException)
@@ -240,6 +282,7 @@ namespace BackedFramework.Resources.HTTP
             finally
             {
                 GC.Collect();
+
             }
         }
 
@@ -247,7 +290,7 @@ namespace BackedFramework.Resources.HTTP
         /// Write the response to the client.
         /// </summary>
         /// <param name="content">The string content to send.</param>
-        public async void Finalize()
+        public async void FinishRequest()
         {
             var dataToSend = base.ToBytes();
             // include buffer size support.
@@ -261,17 +304,20 @@ namespace BackedFramework.Resources.HTTP
                 totalSent += dataLeft < BackedServer.Instance.Config.WriteBuffer ? dataLeft : BackedServer.Instance.Config.WriteBuffer;
                 if (dataLeft != 0)
                     goto writeData;
-                await this._client.GetStream().DisposeAsync();
+                if (base.Headers.ContainsKey("Connection"))
+                    if (base.Headers["Connection"] != "keep-alive")
+                        await this._client.GetStream().DisposeAsync();
                 this.Dispose();
             }
             else
             {
                 // write data to client
                 await this._client.GetStream().WriteAsync(dataToSend);
-                await this._client.GetStream().DisposeAsync();
+                if (base.Headers.ContainsKey("Connection"))
+                    if (base.Headers["Connection"] != "keep-alive")
+                        await this._client.GetStream().DisposeAsync();
                 this.Dispose();
             }
-
             GC.Collect();
         }
 
@@ -302,10 +348,17 @@ namespace BackedFramework.Resources.HTTP
             base.Headers.Add("Set-Cookie", cookie.ToString());
         }
 
-        public void Dispose()
+        public async void Dispose()
         {
-            Console.WriteLine($"Request completed");
+            Logger.Log(Logger.LogLevel.Debug, $"Request completed, there are currently: {_instanceCount} requests in progress and there are {_instanceCount - 1} zombie requests.");
+
+            _instanceCount--;
+
+            await this._client.GetStream().DisposeAsync();
+            this._client.Dispose();
             GC.Collect();
+            GC.SuppressFinalize(this);
+            GC.WaitForPendingFinalizers();
         }
     }
 }

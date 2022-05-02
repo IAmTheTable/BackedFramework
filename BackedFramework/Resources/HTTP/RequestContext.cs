@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BackedFramework.Resources.Logging;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,7 +10,7 @@ namespace BackedFramework.Resources.HTTP
     /// <summary>
     /// A class that helps with reading and writing HTTP requests.
     /// </summary>
-    public class RequestContext
+    public class RequestContext : IDisposable
     {
         private readonly HTTPParser _parser;
         internal RequestContext(HTTPParser parser)
@@ -55,6 +56,14 @@ namespace BackedFramework.Resources.HTTP
             {
                 return this._parser.Headers;
             }
+        }
+
+        public void Dispose()
+        {
+            Logger.Log(Logger.LogLevel.Debug, "Disposing Request Context");
+
+            GC.Collect();
+            GC.SuppressFinalize(this);
         }
     }
 }

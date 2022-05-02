@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BackedFramework.Resources.Logging;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace BackedFramework.Resources.HTTP
 {
-    internal class RequestBase
+    internal class RequestBase : IDisposable
     {
         private readonly HTTPParser _parser;
         internal RequestBase(HTTPParser parser)
@@ -72,6 +73,14 @@ namespace BackedFramework.Resources.HTTP
         public DateTime TimeOfRequest
         {
             get => this._parser.TimeOfReq;
+        }
+
+        public void Dispose()
+        {
+            Logger.Log(Logger.LogLevel.Debug, "Disposing Request Base");
+
+            GC.Collect();
+            GC.SuppressFinalize(this);            
         }
     }
 }

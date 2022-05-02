@@ -10,7 +10,7 @@ namespace BackedFramework.Controllers
     /// <summary>
     /// A class to represent a controller, useful for routing requests to the correct controller.
     /// </summary>
-    public class BaseController
+    public class BaseController : IDisposable
     {
         /// <summary>
         /// An instance of a response context object.
@@ -22,5 +22,11 @@ namespace BackedFramework.Controllers
         /// </summary>
         /// <seealso cref="RequestContext"/>
         public RequestContext Request { get; internal set; }
+
+        public void Dispose()
+        {
+            Console.WriteLine("Base controller has been disposed.");
+            GC.Collect();
+        }
     }
 }

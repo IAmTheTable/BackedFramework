@@ -3,12 +3,14 @@ global using System.Net.Sockets;
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using BackedFramework.Api.Routing;
 using BackedFramework.Resources.Exceptions;
 using BackedFramework.Resources.HTTP;
+using BackedFramework.Resources.Logging;
 using BackedFramework.Resources.Statistics;
 using Thread = BackedFramework.Resources.Extensions.Thread;
 
@@ -48,6 +50,10 @@ namespace BackedFramework.Server
         /// <exception cref="MultiInstanceException">Thrown when trying to create more than one instance of a BackedServer.</exception>
         internal BackedServer(BackedConfig config)
         {
+            AppDomain.CurrentDomain.ProcessExit += CurrentDomain_ProcessExit;
+            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+            Process.GetCurrentProcess().Exited += BackedServer_Exited;
+
             // only allow a single instance of the server to exist
             if (Instance is not null)
                 throw new MultiInstanceException("Only one instance of BackedServer can be created.");
@@ -64,6 +70,36 @@ namespace BackedFramework.Server
             ClientRequest += OnClientRequest;
 
             ConfigureServer();
+        }
+
+        private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            if(e.IsTerminating)
+            {
+                if (!Directory.Exists("backed-logs"))
+                    Directory.CreateDirectory("backed-logs");
+
+                File.WriteAllLines($"backed-logs/{DateTime.Now.ToString("G").Replace(" ", "-")}.log", Logger.DumpLogs());
+                Logger.Log(Logger.LogLevel.Debug, "Dumped all logs");                
+            }
+        }
+
+        private void BackedServer_Exited(object sender, EventArgs e)
+        {
+            if (!Directory.Exists("backed-logs"))
+                Directory.CreateDirectory("backed-logs");
+
+            File.WriteAllLines($"backed-logs/{DateTime.Now.ToString("G").Replace(" ", "-")}.log", Logger.DumpLogs());
+            Logger.Log(Logger.LogLevel.Debug, "Dumped all logs");
+        }
+
+        private void CurrentDomain_ProcessExit(object sender, EventArgs e)
+        {
+            if (!Directory.Exists("backed-logs"))
+                Directory.CreateDirectory("backed-logs");
+
+            File.WriteAllLines($"backed-logs/{DateTime.Now.ToString("G").Replace(" ", "-")}.log", Logger.DumpLogs());
+            Logger.Log(Logger.LogLevel.Debug, "Dumped all logs");
         }
 
         public static BackedServer Initialize(BackedConfig config) => new(config);

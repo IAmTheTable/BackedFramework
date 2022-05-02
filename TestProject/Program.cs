@@ -16,7 +16,7 @@ namespace TestProject
                 RootDirectory = @"C:\Users\asanc052\Desktop\Work\FamilyWebsite\School_HtmlFamilyProject",
                 UseMultiThreading = true,
                 MaxThreads = -1,
-                DynamicBuffers = false,
+                DynamicBuffers = true,
                 ReadBuffer = 10,
                 WriteBuffer = 10,
             });
@@ -35,6 +35,7 @@ namespace TestProject
         public void ImageRequest()
         {
             base.Response.SendRawFile(true, $"{base.Request.Path}");
+            Console.WriteLine($"Client requested: {base.Request.Path}");
         }
 
         [Route("/home", BackedFramework.Resources.HTTP.HTTPMethods.GET)]
@@ -58,7 +59,7 @@ namespace TestProject
         public void NotIndex()
         {
             base.Response.Content = "Not Hello World.";
-            base.Response.Finalize();
+            base.Response.FinishRequest();
         }
 
         [Route("/notadmin", BackedFramework.Resources.HTTP.HTTPMethods.POST)]

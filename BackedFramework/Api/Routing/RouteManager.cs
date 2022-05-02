@@ -9,6 +9,7 @@ using BackedFramework.Controllers;
 using BackedFramework.Resources.HTTP;
 using BackedFramework.Server;
 using BackedFramework.Resources.Exceptions;
+using BackedFramework.Resources.Logging;
 
 namespace BackedFramework.Api.Routing
 {
@@ -17,7 +18,16 @@ namespace BackedFramework.Api.Routing
     /// </summary>
     internal class RouteManager : IDisposable
     {
+        /// <summary>
+        /// Map created instances to a dictionary to help manage memory.
+        /// </summary>
+        private readonly Dictionary<Type, BaseController> _routingInstances = new();
+
+        /// <summary>
+        /// Static instance of the RouteManager if I need to use it in another class.
+        /// </summary>
         internal static RouteManager s_instance;
+        
         /// <summary>
         /// A dictionary of all specified routes.
         /// </summary>
@@ -69,7 +79,14 @@ namespace BackedFramework.Api.Routing
             s_instance = this;
         }
 
-
+        /// <summary>
+        /// Attempt to execute a mapped route, will return a 404 if a route is not found or if a resource requested is not found.
+        /// </summary>
+        /// <param name="parser">HTTP Request that will be used</param>
+        /// <param name="rspCtx">Response context</param>
+        /// <param name="reqCtx">Request context</param>
+        /// <returns>True if the route was handled correctly, False if the function failed to properly handle the request.</returns>
+        /// <remarks>This should NEVER be False, if the returning result is false, then something REALLY bad must've happend. Could potentially identify security vulnerabilities.</remarks>
         internal bool TryExecuteRoute(HTTPParser parser, ResponseContext rspCtx, RequestContext reqCtx)
         {
             // define used values
@@ -88,13 +105,7 @@ namespace BackedFramework.Api.Routing
                     return true; // invalid request, handle later.
                 }
 
-                // NOTES: Small bug that it wont actually like, find the proper path and method in relation to the function that is being called,
-                // - so it will just return without closing the connection properly.
-                // - to fix just, be better at finding the proper path and method. - or just be better :troll:
-
-
-                // NOTES: I need to fix detecting proper routes, using a better method
-
+                // get the routing result
                 var route = routeResult.First();
 
                 // the function that the route will use
@@ -102,23 +113,34 @@ namespace BackedFramework.Api.Routing
                 var targetRouteClass = targetRouteFunc.Item1;
 
                 // create the controller
-                var controller = Activator.CreateInstance(targetRouteClass) as BaseController;
+                BaseController controller = null;
+                if (!_routingInstances.ContainsKey(targetRouteClass))
+                {
+                    controller = Activator.CreateInstance(targetRouteClass) as BaseController;
+                    _routingInstances.Add(targetRouteClass, controller);
+                }
+                else
+                {
+                    controller = _routingInstances[targetRouteClass];
+                }
+                
+                // define controller contexts.
                 controller.Response = rspCtx;
                 controller.Request = reqCtx;
 
                 try
                 {
                     // check if the route and path are the same, if so then return the index, if the index function is not present, then return 404.
-                    if(fullpath == route.Route)
+                    if (fullpath == route.Route)
                     {
                         var hasIndex = targetRouteFunc.Item2.ToList().Any(x => x.Name.ToLower() == "index");
-                        if(!hasIndex)
+                        if (!hasIndex)
                         {
                             // send the 404
                             rspCtx.SendNotFound();
                             return true;
                         }
-                        
+
                         // invoke the Index function for the client to recieve.
                         targetRouteClass.GetMethod("Index").Invoke(controller, Array.Empty<object>());
                         return true;
@@ -161,6 +183,7 @@ namespace BackedFramework.Api.Routing
                 catch
                 {
                     // maybe log this?
+                    Logger.Log(Logger.LogLevel.Fatal, "Failed to execute route, this is a fatal error, please check any requests for malicious data.");
                     return false;
                 }
 
@@ -187,9 +210,10 @@ namespace BackedFramework.Api.Routing
         /// <summary>
         /// Only implementing to help free resources from inital instantiation.
         /// </summary>
-        void IDisposable.Dispose()
+        public void Dispose()
         {
             GC.Collect();
+            GC.SuppressFinalize(this);
         }
     }
 }

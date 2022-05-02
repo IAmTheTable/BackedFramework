@@ -19,6 +19,7 @@
  * - and even parsing the HTTP packet.       *
  *********************************************/
 
+using BackedFramework.Resources.Logging;
 using System.Text;
 
 namespace BackedFramework.Resources.HTTP
@@ -149,7 +150,7 @@ namespace BackedFramework.Resources.HTTP
         /// <summary>
         /// HTTP version of the request
         /// </summary>
-        public string Version { get; set; } = "HTTP/1.1";
+        public string Version { get; set; } = "HTTP/2";
         /// <summary>
         /// HTTP Status code for the request response
         /// </summary>
@@ -169,12 +170,12 @@ namespace BackedFramework.Resources.HTTP
         public override string ToString()
         {
             var sb = new StringBuilder();
-            sb.AppendLine(Version + " " + Code + " " + Message);
+            sb.Append($"{Version} {Code} {Message}\r\n");
             foreach (var header in Headers)
             {
-                sb.AppendLine(header.Key + ":" + header.Value);
+                sb.Append(header.Key + ": " + header.Value + "\n");
             }
-            sb.AppendLine("\r\n" + Content);
+            sb.Append("\r\n" + Content + "\r\n\r\n");
             return sb.ToString();
         }
         /// <summary>
@@ -196,6 +197,8 @@ namespace BackedFramework.Resources.HTTP
             this.Method = null;
             this.Url = null;
             this.Code = null;
+
+            Logger.Log(Logger.LogLevel.Debug, "Disposing HTTP Parser");
 
             GC.Collect();
             GC.SuppressFinalize(this);

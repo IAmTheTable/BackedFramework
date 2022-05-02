@@ -1,9 +1,10 @@
-﻿namespace BackedFramework.Resources.HTTP
+﻿using BackedFramework.Resources.Logging;
+namespace BackedFramework.Resources.HTTP
 {
     /// <summary>
     /// A base class for HTTP server resources.
     /// </summary>
-    public class ResponseBase
+    public class ResponseBase : IDisposable
     {
         private readonly HTTPParser _parser;
         internal ResponseBase(HTTPParser parser) { this._parser = parser; }
@@ -41,5 +42,12 @@
 
         public byte[] ToBytes() => _parser.ToBytes();
         public override string ToString() => this._parser.ToString();
+
+        public void Dispose()
+        {
+            Logger.Log(Logger.LogLevel.Debug, "Disposing Response Base");
+            GC.Collect();
+            GC.SuppressFinalize(this);
+        }
     }
 }

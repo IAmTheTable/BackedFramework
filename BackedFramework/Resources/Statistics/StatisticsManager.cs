@@ -22,6 +22,9 @@ namespace BackedFramework.Resources.Statistics
         {
             if (endTime != DateTime.MinValue)
                 PrintTiming();
+
+            GC.Collect();
+            GC.SuppressFinalize(this);
         }
     }
 }
