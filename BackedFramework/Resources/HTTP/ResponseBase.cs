@@ -9,6 +9,8 @@ namespace BackedFramework.Resources.HTTP
         private readonly HTTPParser _parser;
         internal ResponseBase(HTTPParser parser) { this._parser = parser; }
 
+        internal HTTPParser Parser { get { return this._parser; } }
+
         /// <summary>
         /// The HTTP status code(number) that the browser will recieve.
         /// </summary>

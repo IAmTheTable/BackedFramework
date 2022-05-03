@@ -12,7 +12,10 @@ using BackedFramework.Resources.Exceptions;
 using BackedFramework.Resources.HTTP;
 using BackedFramework.Resources.Logging;
 using BackedFramework.Resources.Statistics;
+
 using Thread = BackedFramework.Resources.Extensions.Thread;
+using TcpListener = BackedFramework.Resources.Extensions.TcpListener;
+using TcpClient = BackedFramework.Resources.Extensions.TcpClient;
 
 namespace BackedFramework.Server
 {
@@ -21,12 +24,12 @@ namespace BackedFramework.Server
         /// <summary>
         /// Called when a client attempts to connect to the server.
         /// </summary>
-        internal static event Func<TcpClient, Task> ClientConnect;
+        internal static event Action<TcpClient> ClientConnect;
 
         /// <summary>
         /// Called when a valid request is made to the server from a client.
         /// </summary>
-        internal static event Func<TcpClient, HTTPParser, Task> ClientRequest;
+        internal static event Action<TcpClient, HTTPParser> ClientRequest;
 
         /// <summary>
         /// The static instance of the server.
@@ -79,7 +82,7 @@ namespace BackedFramework.Server
                 if (!Directory.Exists("backed-logs"))
                     Directory.CreateDirectory("backed-logs");
 
-                File.WriteAllLines($"backed-logs/{DateTime.Now.ToString("G").Replace(" ", "-")}.log", Logger.DumpLogs());
+                File.WriteAllLines($"backed-logs/{DateTime.Now.ToString("MM-dd-yyyy-HH-mm-ss").Replace(" ", "-").Replace("\\", "-")}.log", Logger.DumpLogs());
                 Logger.Log(Logger.LogLevel.Debug, "Dumped all logs");                
             }
         }
@@ -89,7 +92,7 @@ namespace BackedFramework.Server
             if (!Directory.Exists("backed-logs"))
                 Directory.CreateDirectory("backed-logs");
 
-            File.WriteAllLines($"backed-logs/{DateTime.Now.ToString("G").Replace(" ", "-")}.log", Logger.DumpLogs());
+            File.WriteAllLines($"backed-logs/{DateTime.Now.ToString("MM-dd-yyyy-HH-mm-ss").Replace(" ", "-").Replace("\\", "-")}.log", Logger.DumpLogs());
             Logger.Log(Logger.LogLevel.Debug, "Dumped all logs");
         }
 
@@ -98,7 +101,7 @@ namespace BackedFramework.Server
             if (!Directory.Exists("backed-logs"))
                 Directory.CreateDirectory("backed-logs");
 
-            File.WriteAllLines($"backed-logs/{DateTime.Now.ToString("G").Replace(" ", "-")}.log", Logger.DumpLogs());
+            File.WriteAllLines($"backed-logs/{DateTime.Now.ToString("MM-dd-yyyy-HH-mm-ss").Replace(" ", "-").Replace("\\", "-")}.log", Logger.DumpLogs());
             Logger.Log(Logger.LogLevel.Debug, "Dumped all logs");
         }
 
@@ -120,27 +123,48 @@ namespace BackedFramework.Server
             // start the server
             this._server.Start();
 
-            new Thread(async () =>
+            // accept connections
+            this._server.BeginAcceptTcpClient(OnClientRequestConnection);
+
+            /*new Thread(async () =>
             {
                 while (true)
                 {
                     if (!this._server.Pending())
                         continue;
 
-                    var client = await this._server.AcceptTcpClientAsync();
-                    await ClientConnect.Invoke(client);
+
+                    //var client = await this._server.AcceptTcpClientAsync();
+                    //ClientConnect.Invoke(client);
                 }
-            }).Start();
-            
+            }).Start();*/
+
             System.Threading.Thread.Sleep(-1);
         }
-        
-        private static async Task OnClientRequest(TcpClient client, HTTPParser parser)
+
+        private void OnClientRequestConnection(IAsyncResult ar)
+        {
+            try
+            {
+                var client = this._server.EndAcceptTcpClient(ar);
+                ClientConnect.Invoke(client);
+                this._server.BeginAcceptTcpClient(OnClientRequestConnection, null);
+            }
+            catch (Exception e)
+            {
+                Logger.Log(Logger.LogLevel.Error, e.Message);
+            }
+        }
+
+
+
+        private static void OnClientRequest(TcpClient client, HTTPParser parser)
         {
             //Console.WriteLine($"Current thread context: {Environment.CurrentManagedThreadId}");
 
-            RequestContext reqCtx = new(parser);
-            ResponseContext rspCtx = new();
+            using RequestContext reqCtx = new(parser);
+            using ResponseContext rspCtx = new();
+            rspCtx.DefineRequestContext(reqCtx);
             rspCtx.DefineClient(client); // set the client for the response context.
 
             if (!RouteManager.s_instance.TryExecuteRoute(parser, rspCtx, reqCtx))
@@ -148,8 +172,7 @@ namespace BackedFramework.Server
 #if DEBUG
                 throw new Exception("failed to execute route...");
 #else
-                rspCtx.SetStatusCode(StatusCode.NotFound);
-                rspCtx.Content = "Requested Resource Not Found";
+                rspCtx.SendNotFound();
 #endif
                 // maybe log failed requests...
             }
@@ -162,11 +185,10 @@ namespace BackedFramework.Server
         /// <param name="client">The TcpClient instance of the client that connects to the server.</param>
         /// <returns>None</returns>
         /// TODO: Make sure to handle the threading...
-        private static async Task OnClientConnect(TcpClient client)
+        private static void OnClientConnect(TcpClient client)
         {
             //Console.WriteLine($"Current thread context: {Environment.CurrentManagedThreadId}");
             using StatisticsManager statManager = new();
-            await Task.Delay(0);
             new Thread(async () =>
             {
                 var clientStream = client.GetStream();
@@ -204,7 +226,7 @@ namespace BackedFramework.Server
 #endif
 
                 using HTTPParser parser = new(Encoding.UTF8.GetString(buffer));
-                await ClientRequest.Invoke(client, parser);
+                ClientRequest.Invoke(client, parser);
             }).Start();
         }
     }

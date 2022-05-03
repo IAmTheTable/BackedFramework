@@ -29,7 +29,7 @@ namespace BackedFramework.Resources.Logging
             }
             else
             {
-                _logs.Add(level, new[] { $"[{Enum.GetName(level)}] {string.Join(" ", args)}" });
+                _logs.Add(level, new[] { $"[{Enum.GetName(level)}] [{DateTime.Now:G}] {string.Join(" ", args)}" });
             }
         }
 
