@@ -29,7 +29,7 @@ namespace BackedFramework.Server
         /// <summary>
         /// Called when a valid request is made to the server from a client.
         /// </summary>
-        internal static event Action<TcpClient, HTTPParser> ClientRequest;
+        internal static event Action<string, HTTPParser> ClientRequest;
 
         /// <summary>
         /// The static instance of the server.
@@ -69,7 +69,7 @@ namespace BackedFramework.Server
             this._server = new(IPAddress.Any, this.Config.ListeningPort);
 
             // subscribe to the server events
-            ClientConnect += OnClientConnect;
+            ClientConnect += OnClientConnectTest; //OnClientConnect
             ClientRequest += OnClientRequest;
 
             ConfigureServer();
@@ -119,6 +119,7 @@ namespace BackedFramework.Server
 
             // will be automatically disposed upon leaving the current scope
             using var x = new RouteManager();
+            ConnectionManager.Initialize();
 
             // start the server
             this._server.Start();
@@ -156,16 +157,14 @@ namespace BackedFramework.Server
             }
         }
 
-
-
-        private static void OnClientRequest(TcpClient client, HTTPParser parser)
+        private static void OnClientRequest(string ip, HTTPParser parser)
         {
             //Console.WriteLine($"Current thread context: {Environment.CurrentManagedThreadId}");
 
             using RequestContext reqCtx = new(parser);
             using ResponseContext rspCtx = new();
             rspCtx.DefineRequestContext(reqCtx);
-            rspCtx.DefineClient(client); // set the client for the response context.
+            rspCtx.DefineClient(ip); // set the client for the response context.
 
             if (!RouteManager.s_instance.TryExecuteRoute(parser, rspCtx, reqCtx))
             {
@@ -178,6 +177,40 @@ namespace BackedFramework.Server
             }
         }
 
+        private static void OnClientConnectTest(TcpClient client)
+        {
+            // handle fixed buffers
+            if(!BackedServer.Instance.Config.DynamicBuffers)
+            {
+                // TODO: add fixed buffer support later.
+                return;
+            }
+
+            while(client.Available == 0)
+            {
+                System.Threading.Thread.Sleep(1);
+            }
+
+            ConnectionManager._instance.AddConnection(client);
+
+            // allocate buffer and start reading from the client
+            var buffer = new byte[client.Available];
+            client.GetStream().BeginRead(buffer, 0, buffer.Length, OnDataRecieved, null);
+
+            // Function to handle the data recieved from the client.
+            void OnDataRecieved(IAsyncResult result)
+            {
+                var countDataRecieved = client.GetStream().EndRead(result);
+                // check if the data matches...
+                if (buffer.Length == countDataRecieved)
+                {
+                    Logger.Log(Logger.LogLevel.Debug, "Successfully read data from client.");
+                    // convert the buffer into an instance of HTTPParser, then invoke the client request event.
+                    using HTTPParser parser = new(Encoding.UTF8.GetString(buffer));
+                    ClientRequest.Invoke(client.GetIp(), parser);
+                }
+            }
+        }
 
         /// <summary>
         /// Called when a client connects to the server.
@@ -192,10 +225,11 @@ namespace BackedFramework.Server
             new Thread(async () =>
             {
                 var clientStream = client.GetStream();
-                if (client.Available < 1)
+
+                while(client.Available < 1)
                 {
-                    await clientStream.DisposeAsync();
-                    return;
+                    await Task.Delay(1);
+                    Logger.Log(Logger.LogLevel.Debug, "Waiting for client to send data...");
                 }
 
                 // determine the buffer size per request
@@ -226,7 +260,7 @@ namespace BackedFramework.Server
 #endif
 
                 using HTTPParser parser = new(Encoding.UTF8.GetString(buffer));
-                ClientRequest.Invoke(client, parser);
+                ClientRequest.Invoke(client.GetIp(), parser);
             }).Start();
         }
     }

@@ -17,6 +17,12 @@
         public string RootDirectory { get; set; } = "root";
 
         /// <summary>
+        /// The timeout (in seconds) for clients to be connected to the server without sending a request.
+        /// </summary>
+        /// <remarks>If a client doesnt send a request within the specified time, it will automatically disconnect the client from the server.</remarks>
+        public int ConnectionTimeout { get; set; } = 10;
+
+        /// <summary>
         /// The default API version, doesnt have to be used, but still here for completeness.
         /// </summary>
         public string ApiVersion { get; set; } = "v1";

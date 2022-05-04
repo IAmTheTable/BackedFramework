@@ -6,6 +6,7 @@ namespace BackedFramework.Resources.HTTP
     /// </summary>
     public class ResponseBase : IDisposable
     {
+        private MemoryStream _dataStreamB = new();
         private readonly HTTPParser _parser;
         internal ResponseBase(HTTPParser parser) { this._parser = parser; }
 
@@ -42,6 +43,12 @@ namespace BackedFramework.Resources.HTTP
             set => this._parser.Headers = value;
         }
 
+        public MemoryStream ToStream()
+        {
+            _dataStreamB.Write(this.ToBytes());
+            return _dataStreamB;
+        }
+        
         public byte[] ToBytes() => _parser.ToBytes();
         public override string ToString() => this._parser.ToString();
 

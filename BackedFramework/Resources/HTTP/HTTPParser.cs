@@ -29,6 +29,11 @@ namespace BackedFramework.Resources.HTTP
         internal HTTPParser() { }
         internal HTTPParser(string Input)
         {
+            if(string.IsNullOrWhiteSpace(Input))
+            {
+                Logger.Log(Logger.LogLevel.Error, "Failed parse HTTP packet, input is null or empty.");
+                return;
+            }
             // remove all /r Format from Input
             Input = Input.Replace("\r", "");
             // convert each line as a "header"
