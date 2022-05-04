@@ -43,6 +43,8 @@ namespace BackedFramework.Resources.HTTP
             set => this._parser.Headers = value;
         }
 
+        internal void SetStream(MemoryStream ms) => _dataStreamB = ms;
+
         public MemoryStream ToStream()
         {
             _dataStreamB.Write(this.ToBytes());

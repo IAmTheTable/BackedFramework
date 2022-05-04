@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -8,14 +9,21 @@ namespace BackedFramework.Resources.Extensions
 {
     internal class TcpClient : System.Net.Sockets.TcpClient
     {
+        internal NetworkStream stream;
         internal DateTimeOffset lastRequest { get; set; } = DateTime.Now;
         private bool _isWriting = false;
         public TcpClient() : base() { }
         public TcpClient(Socket s) : base()
         {
             base.Client = s;
+            stream = new NetworkStream(s);
         }
 
+        public new NetworkStream GetStream()
+        {
+            return this.stream;
+        }
+        
         public void ReadData(Action<byte[]> callback)
         {
             // allocate the buffer
@@ -72,7 +80,7 @@ namespace BackedFramework.Resources.Extensions
                 Logging.Logger.Log(Logging.Logger.LogLevel.Warning, "Failed to write data to the stream.");
             }
         }
-        
+
         public void WriteAsync(MemoryStream dataStream, long offset = 0, long count = 0, CancellationToken cancellationToken = default)
         {
             lastRequest = DateTime.Now;

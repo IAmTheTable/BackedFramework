@@ -142,7 +142,6 @@ namespace BackedFramework.Resources.HTTP
         /// <exception cref="Exception">Thrown if the server attempts to send a response to the client, but the client is unavailable to send data to.</exception>
         public async void SendRawFile(bool fromBaseDirectory, string path = "")
         {
-
             byte[] data = Array.Empty<byte>();
             bool success = false;
             if (File.Exists(fromBaseDirectory == true ? BackedServer.Instance.Config.RootDirectory + "/" + path : path))
@@ -191,6 +190,16 @@ namespace BackedFramework.Resources.HTTP
                         GC.Collect();
                     }
                 }
+
+                // get the datastream, flush it, write to it, then copy it over to the base stream.
+                var dataStream = base.ToStream();
+                dataStream.Flush();
+                dataStream.Write(data);
+
+                base.SetStream(dataStream);
+                
+                data = Array.Empty<byte>();
+                
                 // if we have fixed buffers, use them.
                 if (!BackedServer.Instance.Config.DynamicBuffers)
                 {
@@ -337,7 +346,7 @@ namespace BackedFramework.Resources.HTTP
             base.Headers.Add("Set-Cookie", cookie.ToString());
         }
 
-        public new void Dispose()
+        public void Dispose()
         {
             Logger.Log(Logger.LogLevel.Debug, $"Request completed at {this._requestContext.Path}, there are currently: {_instanceCount} requests in progress and there are {_instanceCount - 1} zombie requests.");
 
