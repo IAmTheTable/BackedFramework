@@ -32,9 +32,12 @@ namespace BackedFramework.Server
         private void CheckConnections()
         {
             start:
-            foreach(var key in this._connections.Keys)
+            foreach(var key in this._connections.Keys.ToList())
             {
                 var connection = this._connections[key];
+
+                if (connection is null)
+                    continue;
                 
                 bool isTimeout = connection.lastRequest.ToUnixTimeSeconds() + BackedServer.Instance.Config.ConnectionTimeout < DateTimeOffset.Now.ToUnixTimeSeconds();
                 bool invalidInstance = connection is null;
@@ -85,6 +88,8 @@ namespace BackedFramework.Server
                 return;
 
             Logger.Log(Logger.LogLevel.Debug, $"Removed connection for client: {ip}");
+
+            _connections[ip].Dispose();
 
             _connections.Remove(ip);
         }

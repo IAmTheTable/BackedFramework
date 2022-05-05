@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -9,21 +8,20 @@ namespace BackedFramework.Resources.Extensions
 {
     internal class TcpClient : System.Net.Sockets.TcpClient
     {
-        internal NetworkStream stream;
         internal DateTimeOffset lastRequest { get; set; } = DateTime.Now;
         private bool _isWriting = false;
+
+        /// <summary>
+        /// A list of tasks that the client is currently running, used for waiting on disposal on the client.
+        /// </summary>
+        private List<Task> _currentOperations = new();
+        
         public TcpClient() : base() { }
         public TcpClient(Socket s) : base()
         {
             base.Client = s;
-            stream = new NetworkStream(s);
         }
 
-        public new NetworkStream GetStream()
-        {
-            return this.stream;
-        }
-        
         public void ReadData(Action<byte[]> callback)
         {
             // allocate the buffer
@@ -59,53 +57,45 @@ namespace BackedFramework.Resources.Extensions
         /// <returns>None</returns>
         public void WriteAsync(byte[] data, long offset = 0, long count = 0, CancellationToken cancellationToken = default)
         {
-            lastRequest = DateTime.Now;
-
-            // return if the client isnt connected
-            if (!base.Connected)
-                return;
-            // write data to the stream
-            count = data.Length;
-            try
+            var task = Task.Run(() =>
             {
-                _isWriting = true;
-                var res = base.GetStream().BeginWrite(data, (int)offset, (int)count, OnFinishedWriting, base.GetStream());
-                if (!res.IsCompleted)
-                    res.AsyncWaitHandle.WaitOne();
+                lastRequest = DateTime.Now;
 
-                //await base.GetStream().WriteAsync(data, offset, count, cancellationToken);
-            }
-            catch
-            {
-                Logging.Logger.Log(Logging.Logger.LogLevel.Warning, "Failed to write data to the stream.");
-            }
-        }
+                // return if the client isnt connected
+                if (!base.Connected)
+                    return;
+                // write data to the stream
+                count = data.Length;
+                try
+                {
+                    _isWriting = true;
+                    var res = base.GetStream().BeginWrite(data, (int)offset, (int)count, OnFinishedWriting, base.GetStream());
+                    if (!res.IsCompleted)
+                        res.AsyncWaitHandle.WaitOne();
 
-        public void WriteAsync(MemoryStream dataStream, long offset = 0, long count = 0, CancellationToken cancellationToken = default)
-        {
-            lastRequest = DateTime.Now;
+                    //await base.GetStream().WriteAsync(data, offset, count, cancellationToken);
+                }
+                catch
+                {
+                    Logging.Logger.Log(Logging.Logger.LogLevel.Warning, "Failed to write data to the stream.");
+                }
+            });
 
-            if (!base.Connected)
-                return;
-
-            try
-            {
-                this.WriteAsync(dataStream.ToArray());
-                dataStream.Dispose();
-            }
-            catch
-            {
-                Logging.Logger.Log(Logging.Logger.LogLevel.Warning, "Failed to write data to the stream.");
-            }
+            _currentOperations.Add(task);
         }
 
         private void OnFinishedWriting(IAsyncResult result)
         {
-            lastRequest = DateTime.Now;
-            Logging.Logger.Log(Logging.Logger.LogLevel.Debug, "Finished writing data to the stream.");
-            base.GetStream().EndWrite(result);
-            base.GetStream().Dispose();
-            _isWriting = false;
+            var task = Task.Run(() =>
+            {
+                lastRequest = DateTime.Now;
+                Logging.Logger.Log(Logging.Logger.LogLevel.Debug, "Finished writing data to the stream.");
+                base.GetStream().EndWrite(result);
+                base.GetStream().FlushAsync();
+                _isWriting = false;
+            });
+            
+            _currentOperations.Add(task);
         }
 
         public string GetIp() => base.Client.RemoteEndPoint.ToString().Split(':')[0];
@@ -113,8 +103,11 @@ namespace BackedFramework.Resources.Extensions
         public new void Dispose()
         {
             Logging.Logger.Log(Logging.Logger.LogLevel.Info, "Disposing TcpClient.");
-            if (!_isWriting)
-                base.Dispose();
+
+            Task.WaitAll(_currentOperations.ToArray());
+            base.GetStream().Dispose();
+            base.Dispose();
+            Logging.Logger.Log(Logging.Logger.LogLevel.Info, "Finished Disposition.");
         }
     }
 }

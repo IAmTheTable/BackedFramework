@@ -19,14 +19,8 @@ namespace BackedFramework.Resources.HTTP
         private string _clientAddress;
         private CancellationToken _cancellationToken = new();
         private RequestContext _requestContext;
-        
-        private TcpClient _client
-        {
-            get
-            {
-                return ConnectionManager._instance.GetConnection(_clientAddress);
-            }
-        }
+
+        private TcpClient _client;
 
         internal ResponseContext() : base(new())
         {
@@ -47,7 +41,7 @@ namespace BackedFramework.Resources.HTTP
         /// A function to set the client, easier than constructing... might change later...
         /// </summary>
         /// <param name="client">Client instance</param>
-        internal void DefineClient(string clientIp) => this._clientAddress = clientIp;
+        internal void DefineClient(TcpClient clientIp) => this._client = clientIp;
 
         /// <summary>
         /// Send a 3XX redirect type request to the client.
@@ -69,10 +63,10 @@ namespace BackedFramework.Resources.HTTP
             if (!BackedServer.Instance.Config.DynamicBuffers)
             {
                 long totalSent = 0;
-                var dataLeft = base.ToStream().Length - totalSent;
+                var dataLeft = base.ToBytes().Length - totalSent;
 
             writeData:
-                this._client.WriteAsync(base.ToStream(), totalSent, dataLeft < BackedServer.Instance.Config.WriteBuffer ? dataLeft : BackedServer.Instance.Config.WriteBuffer, _cancellationToken);
+                this._client.WriteAsync(base.ToBytes(), totalSent, dataLeft < BackedServer.Instance.Config.WriteBuffer ? dataLeft : BackedServer.Instance.Config.WriteBuffer, _cancellationToken);
                 totalSent += dataLeft < BackedServer.Instance.Config.WriteBuffer ? dataLeft : BackedServer.Instance.Config.WriteBuffer;
                 if (dataLeft != 0)
                     goto writeData;
@@ -81,7 +75,7 @@ namespace BackedFramework.Resources.HTTP
             }
 
             // write data to client
-            this._client.WriteAsync(base.ToStream(), cancellationToken: _cancellationToken);
+            this._client.WriteAsync(base.ToBytes(), cancellationToken: _cancellationToken);
         }
 
         /// <summary>
@@ -91,8 +85,6 @@ namespace BackedFramework.Resources.HTTP
         /// <param name="path">Location of the file.</param>
         public void SendFile(bool fromBaseDirectory, string path = "")
         {
-            
-
             if (File.Exists(fromBaseDirectory == true ? BackedServer.Instance.Config.RootDirectory + "/" + path : path))
             {
                 base.Content = File.ReadAllText(fromBaseDirectory == true ? BackedServer.Instance.Config.RootDirectory + "/" + path : path);
@@ -112,7 +104,7 @@ namespace BackedFramework.Resources.HTTP
                     int dataLeft = dataToSend.Length;
                 writeData:
                     dataLeft = dataToSend.Length - totalSent;
-                    this._client.WriteAsync(base.ToStream(), totalSent, dataLeft < BackedServer.Instance.Config.WriteBuffer ? dataLeft : BackedServer.Instance.Config.WriteBuffer, _cancellationToken);
+                    this._client.WriteAsync(dataToSend, totalSent, dataLeft < BackedServer.Instance.Config.WriteBuffer ? dataLeft : BackedServer.Instance.Config.WriteBuffer, _cancellationToken);
                     totalSent += dataLeft < BackedServer.Instance.Config.WriteBuffer ? dataLeft : BackedServer.Instance.Config.WriteBuffer;
                     if (dataLeft != 0)
                         goto writeData;
@@ -121,16 +113,12 @@ namespace BackedFramework.Resources.HTTP
                 }
 
                 // write data to client
-                this._client.WriteAsync(base.ToStream());
+                this._client.WriteAsync(dataToSend);
                 return;
             }
             catch (InvalidOperationException)
             {
                 throw new Exception("Attempted to finalize a request, but the request was already finalized.");
-            }
-            finally
-            {
-                GC.Collect();
             }
         }
 
@@ -144,8 +132,10 @@ namespace BackedFramework.Resources.HTTP
         {
             byte[] data = Array.Empty<byte>();
             bool success = false;
+            // validate that the file exists.
             if (File.Exists(fromBaseDirectory == true ? BackedServer.Instance.Config.RootDirectory + "/" + path : path))
             {
+                // move all data into the buffer
                 data = await File.ReadAllBytesAsync(fromBaseDirectory == true ? BackedServer.Instance.Config.RootDirectory + "/" + path : path, _cancellationToken);
                 success = true;
             }
@@ -170,7 +160,7 @@ namespace BackedFramework.Resources.HTTP
 
                         writeData:
                             dataLeft = dataToSend.Length - totalSent;
-                            this._client.WriteAsync(base.ToStream(), totalSent, dataLeft < BackedServer.Instance.Config.WriteBuffer ? dataLeft : BackedServer.Instance.Config.WriteBuffer, _cancellationToken);
+                            this._client.WriteAsync(base.ToBytes(), totalSent, dataLeft < BackedServer.Instance.Config.WriteBuffer ? dataLeft : BackedServer.Instance.Config.WriteBuffer, _cancellationToken);
                             totalSent += dataLeft < BackedServer.Instance.Config.WriteBuffer ? dataLeft : BackedServer.Instance.Config.WriteBuffer;
                             if (dataLeft != 0)
                                 goto writeData;
@@ -178,7 +168,7 @@ namespace BackedFramework.Resources.HTTP
                             return;
                         }
                         // write data to client
-                        this._client.WriteAsync(base.ToStream(), cancellationToken: _cancellationToken);
+                        this._client.WriteAsync(base.ToBytes(), cancellationToken: _cancellationToken);
                         return;
                     }
                     catch (InvalidOperationException)
@@ -190,16 +180,7 @@ namespace BackedFramework.Resources.HTTP
                         GC.Collect();
                     }
                 }
-
-                // get the datastream, flush it, write to it, then copy it over to the base stream.
-                var dataStream = base.ToStream();
-                dataStream.Flush();
-                dataStream.Write(data);
-
-                base.SetStream(dataStream);
-                
-                data = Array.Empty<byte>();
-                
+                                
                 // if we have fixed buffers, use them.
                 if (!BackedServer.Instance.Config.DynamicBuffers)
                 {
@@ -212,7 +193,7 @@ namespace BackedFramework.Resources.HTTP
                     dataLeft = data.Length - totalSent;
                     try
                     {
-                        this._client.WriteAsync(base.ToStream(), totalSent, dataLeft < BackedServer.Instance.Config.WriteBuffer ? dataLeft : BackedServer.Instance.Config.WriteBuffer, _cancellationToken);
+                        this._client.WriteAsync(data, totalSent, dataLeft < BackedServer.Instance.Config.WriteBuffer ? dataLeft : BackedServer.Instance.Config.WriteBuffer, _cancellationToken);
                     }
                     catch (IOException)
                     {
@@ -223,16 +204,13 @@ namespace BackedFramework.Resources.HTTP
                     if (dataLeft != 0)
                         goto writeData;
 
-                    if (_requestContext.RequestHeaders.ContainsKey("Connection"))
-                        if (_requestContext.RequestHeaders["Connection"] != "keep-alive")
-                            await this._client.GetStream().DisposeAsync();
                     return;
                 }
 
                 // send the data to the client
                 try
                 {
-                    this._client.WriteAsync(base.ToStream(), cancellationToken: _cancellationToken);
+                    this._client.WriteAsync(data, cancellationToken: _cancellationToken);
                 }
                 catch (IOException)
                 {
@@ -251,8 +229,6 @@ namespace BackedFramework.Resources.HTTP
         /// <exception cref="Exception">Thrown when the client has already been sent a response or the client's stream is invalid.</exception>
         public void SendNotFound()
         {
-            
-
             base.Content = "Request resource not found.";
             base.StatusCode = HttpStatusCode.NotFound;
             try
@@ -265,7 +241,7 @@ namespace BackedFramework.Resources.HTTP
                     int dataLeft = dataToSend.Length;
                 writeData:
                     dataLeft = dataToSend.Length - totalSent;
-                    this._client.WriteAsync(base.ToStream(), totalSent, dataLeft < BackedServer.Instance.Config.WriteBuffer ? dataLeft : BackedServer.Instance.Config.WriteBuffer, _cancellationToken);
+                    this._client.WriteAsync(base.ToBytes(), totalSent, dataLeft < BackedServer.Instance.Config.WriteBuffer ? dataLeft : BackedServer.Instance.Config.WriteBuffer, _cancellationToken);
                     totalSent += dataLeft < BackedServer.Instance.Config.WriteBuffer ? dataLeft : BackedServer.Instance.Config.WriteBuffer;
                     if (dataLeft != 0)
                         goto writeData;
@@ -274,7 +250,7 @@ namespace BackedFramework.Resources.HTTP
                 }
 
                 // write data to client
-                this._client.WriteAsync(base.ToStream(), cancellationToken: _cancellationToken);
+                this._client.WriteAsync(base.ToBytes(), cancellationToken: _cancellationToken);
             }
             catch (InvalidOperationException)
             {
@@ -293,8 +269,6 @@ namespace BackedFramework.Resources.HTTP
         /// <param name="content">The string content to send.</param>
         public void FinishRequest()
         {
-            
-
             var dataToSend = base.ToBytes();
             // include buffer size support.
             if (!BackedServer.Instance.Config.DynamicBuffers)
@@ -305,7 +279,7 @@ namespace BackedFramework.Resources.HTTP
             writeData:
                 dataLeft = dataToSend.Length - totalSent;
 
-                this._client.WriteAsync(base.ToStream(), totalSent, dataLeft < BackedServer.Instance.Config.WriteBuffer ? dataLeft : BackedServer.Instance.Config.WriteBuffer, _cancellationToken);
+                this._client.WriteAsync(base.ToBytes(), totalSent, dataLeft < BackedServer.Instance.Config.WriteBuffer ? dataLeft : BackedServer.Instance.Config.WriteBuffer, _cancellationToken);
 
                 totalSent += dataLeft < BackedServer.Instance.Config.WriteBuffer ? dataLeft : BackedServer.Instance.Config.WriteBuffer;
 
@@ -316,7 +290,7 @@ namespace BackedFramework.Resources.HTTP
             }
 
             // write data to client
-            this._client.WriteAsync(base.ToStream(), cancellationToken: _cancellationToken);
+            this._client.WriteAsync(base.ToBytes(), cancellationToken: _cancellationToken);
         }
 
         /// <summary>
@@ -348,7 +322,10 @@ namespace BackedFramework.Resources.HTTP
 
         public void Dispose()
         {
+            Logger.Log(Logger.LogLevel.Info, $"The server sent a connection: {base.Headers["Connection"]} value.");
             Logger.Log(Logger.LogLevel.Debug, $"Request completed at {this._requestContext.Path}, there are currently: {_instanceCount} requests in progress and there are {_instanceCount - 1} zombie requests.");
+
+            //ConnectionManager._instance.RemoveConnection(_requestContext.RequestHeaders["Host"]);
 
             _instanceCount--;
 

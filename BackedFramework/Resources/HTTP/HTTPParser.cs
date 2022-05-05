@@ -180,6 +180,7 @@ namespace BackedFramework.Resources.HTTP
             {
                 sb.Append(header.Key + ": " + header.Value + "\n");
             }
+            sb.Remove(sb.Length - 1, 1);
             sb.Append("\r\n" + Content + "\r\n\r\n");
             return sb.ToString();
         }

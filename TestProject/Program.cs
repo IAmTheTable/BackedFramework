@@ -43,6 +43,8 @@ namespace TestProject
         {
             base.Response.SendFile(true, "what"); 
         }
+
+        
     }
 
 
@@ -66,6 +68,7 @@ namespace TestProject
         public void admin()
         {
             base.Response.SendFile(true, "index.html");
+
         }
     }
 }

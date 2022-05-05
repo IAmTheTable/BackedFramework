@@ -29,7 +29,7 @@ namespace BackedFramework.Server
         /// <summary>
         /// Called when a valid request is made to the server from a client.
         /// </summary>
-        internal static event Action<string, HTTPParser> ClientRequest;
+        internal static event Action<TcpClient, HTTPParser> ClientRequest;
 
         /// <summary>
         /// The static instance of the server.
@@ -77,13 +77,13 @@ namespace BackedFramework.Server
 
         private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
-            if(e.IsTerminating)
+            if (e.IsTerminating)
             {
                 if (!Directory.Exists("backed-logs"))
                     Directory.CreateDirectory("backed-logs");
 
                 File.WriteAllLines($"backed-logs/{DateTime.Now.ToString("MM-dd-yyyy-HH-mm-ss").Replace(" ", "-").Replace("\\", "-")}.log", Logger.DumpLogs());
-                Logger.Log(Logger.LogLevel.Debug, "Dumped all logs");                
+                Logger.Log(Logger.LogLevel.Debug, "Dumped all logs");
             }
         }
 
@@ -157,7 +157,7 @@ namespace BackedFramework.Server
             }
         }
 
-        private static void OnClientRequest(string ip, HTTPParser parser)
+        private static void OnClientRequest(TcpClient ip, HTTPParser parser)
         {
             //Console.WriteLine($"Current thread context: {Environment.CurrentManagedThreadId}");
 
@@ -166,8 +166,16 @@ namespace BackedFramework.Server
             rspCtx.DefineRequestContext(reqCtx);
             rspCtx.DefineClient(ip); // set the client for the response context.
 
+            // add keep alive connection stuff to the response context, will move into the class later
+
+            if (reqCtx.RequestHeaders.ContainsKey("Connection"))
+                if (reqCtx.RequestHeaders["Connection"] == "keep-alive")
+                    rspCtx.Headers.Add("Connection", "close");
+
+            // run the request through the route manager
             if (!RouteManager.s_instance.TryExecuteRoute(parser, rspCtx, reqCtx))
             {
+                Logger.Log(Logger.LogLevel.Warning, "Failed to execute route...");
 #if DEBUG
                 throw new Exception("failed to execute route...");
 #else
@@ -180,13 +188,13 @@ namespace BackedFramework.Server
         private static void OnClientConnectTest(TcpClient client)
         {
             // handle fixed buffers
-            if(!BackedServer.Instance.Config.DynamicBuffers)
+            if (!BackedServer.Instance.Config.DynamicBuffers)
             {
                 // TODO: add fixed buffer support later.
                 return;
             }
 
-            while(client.Available == 0)
+            while (client.Available == 0)
             {
                 System.Threading.Thread.Sleep(1);
             }
@@ -207,7 +215,7 @@ namespace BackedFramework.Server
                     Logger.Log(Logger.LogLevel.Debug, "Successfully read data from client.");
                     // convert the buffer into an instance of HTTPParser, then invoke the client request event.
                     using HTTPParser parser = new(Encoding.UTF8.GetString(buffer));
-                    ClientRequest.Invoke(client.GetIp(), parser);
+                    ClientRequest.Invoke(client, parser);
                 }
             }
         }
@@ -226,7 +234,7 @@ namespace BackedFramework.Server
             {
                 var clientStream = client.GetStream();
 
-                while(client.Available < 1)
+                while (client.Available < 1)
                 {
                     await Task.Delay(1);
                     Logger.Log(Logger.LogLevel.Debug, "Waiting for client to send data...");
@@ -241,8 +249,8 @@ namespace BackedFramework.Server
                 var buffer = new byte[bufferSize];
                 var totalRead = await clientStream.ReadAsync(buffer);
 
-                // if we havent read all the data already, then continue to read the buffer.
-                readData:
+            // if we havent read all the data already, then continue to read the buffer.
+            readData:
                 if (client.Available != 0)
                 {
                     var nextToRead = client.Available - totalRead;
@@ -260,7 +268,7 @@ namespace BackedFramework.Server
 #endif
 
                 using HTTPParser parser = new(Encoding.UTF8.GetString(buffer));
-                ClientRequest.Invoke(client.GetIp(), parser);
+                ClientRequest.Invoke(client, parser);
             }).Start();
         }
     }
