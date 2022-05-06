@@ -65,10 +65,10 @@ namespace TestProject
         }
 
         [Route("/notadmin", BackedFramework.Resources.HTTP.HTTPMethods.POST)]
-        public void admin()
+        public void admin(string name)
         {
-            base.Response.SendFile(true, "index.html");
-
+            base.Response.Content = $"You queried for {name}";
+            base.Response.FinishRequest();
         }
     }
 }

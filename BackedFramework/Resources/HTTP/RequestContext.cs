@@ -18,6 +18,28 @@ namespace BackedFramework.Resources.HTTP
             this._parser = parser;
         }
         /// <summary>
+        /// If the request contains url parameters, this will return true, if not false.
+        /// </summary>
+        public bool IsQueried
+        {
+            get
+            {
+                return this._parser.IsQueried;
+            }
+        }
+
+        /// <summary>
+        /// The query parameters in the request.
+        /// </summary>
+        public Dictionary<string, string> QueryParameters
+        {
+            get
+            {
+                return this._parser.QueryParameters;
+            }
+        }
+
+        /// <summary>
         /// Path of the request, excluding the FQDN, "/static/404.html" for exmaple.
         /// </summary>
         public string Path
@@ -27,7 +49,7 @@ namespace BackedFramework.Resources.HTTP
                 return this._parser.Url;
             }
         }
-        
+
         /// <summary>
         /// The HTTP method used for the request.
         /// </summary>

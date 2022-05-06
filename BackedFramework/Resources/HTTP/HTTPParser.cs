@@ -5,7 +5,7 @@
  * Date: 4/18/22                             *
  *                                           *
  ******************************************* *
- * Last Modified: 4/18/22 at 10:28AM         *
+ * Last Modified: 5/06/22 at 10:04AM         *
  *                                           *
  ******************************************* *
  * Purpose: A dual purpose class to parse/...*
@@ -24,12 +24,16 @@ using System.Text;
 
 namespace BackedFramework.Resources.HTTP
 {
+    /// <summary>
+    /// Parses and creates HTTP packets.
+    /// </summary>
+    /// <remarks>The backbone of the entire project, without this class, nothing would work.</remarks>
     internal class HTTPParser : IDisposable
     {
         internal HTTPParser() { }
         internal HTTPParser(string Input)
         {
-            if(string.IsNullOrWhiteSpace(Input))
+            if (string.IsNullOrWhiteSpace(Input))
             {
                 Logger.Log(Logger.LogLevel.Error, "Failed parse HTTP packet, input is null or empty.");
                 return;
@@ -38,9 +42,39 @@ namespace BackedFramework.Resources.HTTP
             Input = Input.Replace("\r", "");
             // convert each line as a "header"
             var lines = Input.Split('\n');
-            Method = lines[0].Split(' ')[0]; // extract the HTTP methods
-            Url = lines[0].Split(' ')[1]; // extract the url 
-            Version = lines[0].Split(' ')[2]; // extract the HTTP version
+            this.Method = lines[0].Split(' ')[0]; // extract the HTTP methods
+            this.Url = lines[0].Split(' ')[1]; // extract the url 
+            this.Version = lines[0].Split(' ')[2]; // extract the HTTP version
+
+            // extract query parameters if they exist
+            if (this.Url.Contains("?") && this.Url.IndexOf("?") < this.Url.Length - 1)
+            {
+                this.IsQueried = true;
+
+                // split the queried string...
+                var query = Url.Split('?')[1];
+                var query_params = query.Split('&');
+                
+                // iterate the queried strings...
+                foreach (var param in query_params)
+                {
+                    // retrieve the key value pairs
+
+                    if(param.Split('=').Length < 2)
+                    {
+                        this.QueryParameters.Add(param.Split('=')[0], "");
+                        continue;
+                    }
+
+                    var key = param.Split('=')[0];
+                    var value = param.Split('=')[1];
+                    // add the values to the query parameters dictionary
+                    QueryParameters.Add(key, value);
+                }
+                
+                // fix the url because it still contians the url parameters
+                this.Url = Url.Split('?')[0];
+            }
 
             var headers = lines.Skip(1).ToList(); // skip the first line
 
@@ -126,6 +160,17 @@ namespace BackedFramework.Resources.HTTP
                 }
             }
         }
+
+        /// <summary>
+        /// If the request has query parameters, this is true...
+        /// </summary>
+        public bool IsQueried { get; internal set; } = false;
+
+        /// <summary>
+        /// A key/value pair for query string parameters.
+        /// </summary>
+        public Dictionary<string, string> QueryParameters { get; internal set; } = new();
+        
         /// <summary>
         /// boundary usage for multipart/form-data request types
         /// </summary>
@@ -133,41 +178,41 @@ namespace BackedFramework.Resources.HTTP
         /// <summary>
         /// key values for any form based request 
         /// </summary>
-        public Dictionary<string, string> FormData { get; set; } = new();
+        public Dictionary<string, string> FormData { get; internal set; } = new();
         /// <summary>
         /// any headers used in the request, can be request parameters too
         /// </summary>
-        public Dictionary<string, string> Headers { get; set; } = new();
+        public Dictionary<string, string> Headers { get; internal set; } = new();
 
         /// <summary>
         /// The time of the request being sent or recieved by the server
         /// </summary>
-        public DateTime TimeOfReq { get; } = DateTime.Now;
+        public DateTime TimeOfReq { get; internal set; } = DateTime.Now;
 
         /// <summary>
         /// HTTP method of the request
         /// </summary>
-        public string Method { get; set; } = "";
+        public string Method { get; internal set; } = "";
         /// <summary>
         /// the url of the request, not including the host; Ex: /home
         /// </summary>
-        public string Url { get; set; } = "";
+        public string Url { get; internal set; } = "";
         /// <summary>
         /// HTTP version of the request
         /// </summary>
-        public string Version { get; set; } = "HTTP/2";
+        public string Version { get; internal set; } = "HTTP/2";
         /// <summary>
         /// HTTP Status code for the request response
         /// </summary>
-        public string Code { get; set; } = "200";
+        public string Code { get; internal set; } = "200";
         /// <summary>
         /// HTTP Status message for the request response
         /// </summary>
-        public string Message { get; set; } = "OK";
+        public string Message { get; internal set; } = "OK";
         /// <summary>
         /// Actual body of the request, like the HTML page content
         /// </summary>
-        public string Content { get; set; } = "";
+        public string Content { get; internal set; } = "";
         /// <summary>
         /// Converts all the request data to a string that is valid for an HTTP request
         /// </summary>
@@ -180,7 +225,6 @@ namespace BackedFramework.Resources.HTTP
             {
                 sb.Append(header.Key + ": " + header.Value + "\n");
             }
-            sb.Remove(sb.Length - 1, 1);
             sb.Append("\r\n" + Content + "\r\n\r\n");
             return sb.ToString();
         }

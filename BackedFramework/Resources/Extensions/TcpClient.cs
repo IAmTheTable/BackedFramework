@@ -8,13 +8,13 @@ namespace BackedFramework.Resources.Extensions
 {
     internal class TcpClient : System.Net.Sockets.TcpClient
     {
-        internal DateTimeOffset lastRequest { get; set; } = DateTime.Now;
+        internal DateTimeOffset LastRequest { get; set; } = DateTime.Now;
         private bool _isWriting = false;
 
         /// <summary>
         /// A list of tasks that the client is currently running, used for waiting on disposal on the client.
         /// </summary>
-        private List<Task> _currentOperations = new();
+        private readonly List<Task> _currentOperations = new();
         
         public TcpClient() : base() { }
         public TcpClient(Socket s) : base()
@@ -41,7 +41,7 @@ namespace BackedFramework.Resources.Extensions
                 if (amountRecieved == buffer.Length)
                 {
                     Logging.Logger.Log(Logging.Logger.LogLevel.Debug, "Successfully read all data from client.");
-                    lastRequest = DateTime.Now;
+                    LastRequest = DateTime.Now;
                     callback.Invoke(buffer); // send data back to caller.
                 }
             }
@@ -59,7 +59,7 @@ namespace BackedFramework.Resources.Extensions
         {
             var task = Task.Run(() =>
             {
-                lastRequest = DateTime.Now;
+                LastRequest = DateTime.Now;
 
                 // return if the client isnt connected
                 if (!base.Connected)
@@ -69,17 +69,15 @@ namespace BackedFramework.Resources.Extensions
                 try
                 {
                     _isWriting = true;
-                    var res = base.GetStream().BeginWrite(data, (int)offset, (int)count, OnFinishedWriting, base.GetStream());
+                    var res = base.GetStream().BeginWrite(data, (int)offset, (int)count, OnFinishedWriting, data);
                     if (!res.IsCompleted)
                         res.AsyncWaitHandle.WaitOne();
-
-                    //await base.GetStream().WriteAsync(data, offset, count, cancellationToken);
                 }
                 catch
                 {
                     Logging.Logger.Log(Logging.Logger.LogLevel.Warning, "Failed to write data to the stream.");
                 }
-            });
+            }, cancellationToken);
 
             _currentOperations.Add(task);
         }
@@ -88,10 +86,9 @@ namespace BackedFramework.Resources.Extensions
         {
             var task = Task.Run(() =>
             {
-                lastRequest = DateTime.Now;
+                LastRequest = DateTime.Now;
                 Logging.Logger.Log(Logging.Logger.LogLevel.Debug, "Finished writing data to the stream.");
                 base.GetStream().EndWrite(result);
-                base.GetStream().FlushAsync();
                 _isWriting = false;
             });
             
@@ -105,8 +102,14 @@ namespace BackedFramework.Resources.Extensions
             Logging.Logger.Log(Logging.Logger.LogLevel.Info, "Disposing TcpClient.");
 
             Task.WaitAll(_currentOperations.ToArray());
-            base.GetStream().Dispose();
-            base.Dispose();
+            
+            if(this._isWriting)
+            {
+                while (this._isWriting)
+                    Task.Delay(1);
+            }
+
+            base.Dispose();            
             Logging.Logger.Log(Logging.Logger.LogLevel.Info, "Finished Disposition.");
         }
     }

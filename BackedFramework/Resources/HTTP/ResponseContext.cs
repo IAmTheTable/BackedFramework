@@ -1,13 +1,7 @@
 ﻿using BackedFramework.Resources.Logging;
 using BackedFramework.Server;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 using TcpClient = BackedFramework.Resources.Extensions.TcpClient;
-
 namespace BackedFramework.Resources.HTTP
 {
     /// <summary>
@@ -15,9 +9,9 @@ namespace BackedFramework.Resources.HTTP
     /// </summary>
     public class ResponseContext : ResponseBase, IDisposable
     {
+        public static event Action OnRequestFinished;
         private static int _instanceCount = 0;
-        private string _clientAddress;
-        private CancellationToken _cancellationToken = new();
+        private readonly CancellationToken _cancellationToken = new();
         private RequestContext _requestContext;
 
         private TcpClient _client;
@@ -59,27 +53,13 @@ namespace BackedFramework.Resources.HTTP
             base.Headers.Add("Location", location);
             base.Content = base.ToString();
 
-            // include buffer size support.
-            if (!BackedServer.Instance.Config.DynamicBuffers)
-            {
-                long totalSent = 0;
-                var dataLeft = base.ToBytes().Length - totalSent;
-
-            writeData:
-                this._client.WriteAsync(base.ToBytes(), totalSent, dataLeft < BackedServer.Instance.Config.WriteBuffer ? dataLeft : BackedServer.Instance.Config.WriteBuffer, _cancellationToken);
-                totalSent += dataLeft < BackedServer.Instance.Config.WriteBuffer ? dataLeft : BackedServer.Instance.Config.WriteBuffer;
-                if (dataLeft != 0)
-                    goto writeData;
-
-                return;
-            }
 
             // write data to client
             this._client.WriteAsync(base.ToBytes(), cancellationToken: _cancellationToken);
         }
 
         /// <summary>
-        /// Send a file to the client, does include HTTP headers.
+        /// Send a file to the client, includes the HTTP header.
         /// </summary>
         /// <param name="fromBaseDirectory">Should the function look for the file in the defined root directory?</param>
         /// <param name="path">Location of the file.</param>
@@ -91,30 +71,11 @@ namespace BackedFramework.Resources.HTTP
             }
             else
             {
-                base.Content = "Request resource not found.";
-                base.StatusCode = HttpStatusCode.NotFound;
+                this.SendNotFound();
             }
             try
             {
-                var dataToSend = base.ToBytes();
-                // include buffer size support.
-                if (!BackedServer.Instance.Config.DynamicBuffers)
-                {
-                    int totalSent = 0;
-                    int dataLeft = dataToSend.Length;
-                writeData:
-                    dataLeft = dataToSend.Length - totalSent;
-                    this._client.WriteAsync(dataToSend, totalSent, dataLeft < BackedServer.Instance.Config.WriteBuffer ? dataLeft : BackedServer.Instance.Config.WriteBuffer, _cancellationToken);
-                    totalSent += dataLeft < BackedServer.Instance.Config.WriteBuffer ? dataLeft : BackedServer.Instance.Config.WriteBuffer;
-                    if (dataLeft != 0)
-                        goto writeData;
-
-                    return;
-                }
-
-                // write data to client
-                this._client.WriteAsync(dataToSend);
-                return;
+                this.FinishRequest();
             }
             catch (InvalidOperationException)
             {
@@ -128,7 +89,7 @@ namespace BackedFramework.Resources.HTTP
         /// <param name="fromBaseDirectory">Is the file location in the root directory, specified in the server config</param>
         /// <param name="path">The location of the file</param>
         /// <exception cref="Exception">Thrown if the server attempts to send a response to the client, but the client is unavailable to send data to.</exception>
-        public async void SendRawFile(bool fromBaseDirectory, string path = "")
+        public void SendRawFile(bool fromBaseDirectory, string path = "")
         {
             byte[] data = Array.Empty<byte>();
             bool success = false;
@@ -136,90 +97,41 @@ namespace BackedFramework.Resources.HTTP
             if (File.Exists(fromBaseDirectory == true ? BackedServer.Instance.Config.RootDirectory + "/" + path : path))
             {
                 // move all data into the buffer
-                data = await File.ReadAllBytesAsync(fromBaseDirectory == true ? BackedServer.Instance.Config.RootDirectory + "/" + path : path, _cancellationToken);
+                data = File.ReadAllBytes(fromBaseDirectory == true ? BackedServer.Instance.Config.RootDirectory + "/" + path : path);
                 success = true;
             }
             else
             {
-                base.Content = "Request resource not found.";
-                base.StatusCode = HttpStatusCode.NotFound;
+                this.SendNotFound();
             }
-            try
+            
+            // if the file we tried to read was not found...
+            if (!success)
             {
-                // if the file we tried to read was not found...
-                if (!success)
-                {
-                    try
-                    {
-                        var dataToSend = base.ToBytes();
-                        // include buffer size support.
-                        if (!BackedServer.Instance.Config.DynamicBuffers)
-                        {
-                            int totalSent = 0;
-                            int dataLeft = dataToSend.Length;
-
-                        writeData:
-                            dataLeft = dataToSend.Length - totalSent;
-                            this._client.WriteAsync(base.ToBytes(), totalSent, dataLeft < BackedServer.Instance.Config.WriteBuffer ? dataLeft : BackedServer.Instance.Config.WriteBuffer, _cancellationToken);
-                            totalSent += dataLeft < BackedServer.Instance.Config.WriteBuffer ? dataLeft : BackedServer.Instance.Config.WriteBuffer;
-                            if (dataLeft != 0)
-                                goto writeData;
-
-                            return;
-                        }
-                        // write data to client
-                        this._client.WriteAsync(base.ToBytes(), cancellationToken: _cancellationToken);
-                        return;
-                    }
-                    catch (InvalidOperationException)
-                    {
-                        throw new Exception("Attempted to finalize a request, but the request was already finalized.");
-                    }
-                    finally
-                    {
-                        GC.Collect();
-                    }
-                }
-                                
-                // if we have fixed buffers, use them.
-                if (!BackedServer.Instance.Config.DynamicBuffers)
-                {
-                    // define variables that help us calculate how much data we need to send with fixed buffers.
-                    int totalSent = 0;
-                    int dataLeft = data.Length;
-
-                // continue writing data in segments.
-                writeData:
-                    dataLeft = data.Length - totalSent;
-                    try
-                    {
-                        this._client.WriteAsync(data, totalSent, dataLeft < BackedServer.Instance.Config.WriteBuffer ? dataLeft : BackedServer.Instance.Config.WriteBuffer, _cancellationToken);
-                    }
-                    catch (IOException)
-                    {
-                        Console.WriteLine("Failed to finish writing to the client.");
-                    }
-                    // increase our total data sent count...
-                    totalSent += dataLeft < BackedServer.Instance.Config.WriteBuffer ? dataLeft : BackedServer.Instance.Config.WriteBuffer;
-                    if (dataLeft != 0)
-                        goto writeData;
-
-                    return;
-                }
-
-                // send the data to the client
                 try
                 {
-                    this._client.WriteAsync(data, cancellationToken: _cancellationToken);
+                    // write data to client
+                    this.FinishRequest();
+                    return;
                 }
-                catch (IOException)
+                catch (InvalidOperationException)
                 {
-                    Logger.Log(Logger.LogLevel.Error, "Failed to finish writing to the client.");
+                    throw new Exception("Attempted to finalize a request, but the request was already finalized.");
+                }
+                finally
+                {
+                    GC.Collect();
                 }
             }
-            catch (InvalidOperationException)
+
+            // send the data to the client
+            try
             {
-                throw new Exception("Attempted to finalize a request, but the request was already finalized.");
+                this._client.WriteAsync(data);
+            }
+            catch (IOException)
+            {
+                Logger.Log(Logger.LogLevel.Error, "Failed to finish writing to the client.");
             }
         }
 
@@ -233,24 +145,8 @@ namespace BackedFramework.Resources.HTTP
             base.StatusCode = HttpStatusCode.NotFound;
             try
             {
-                var dataToSend = base.ToBytes();
-                // include buffer size support.
-                if (!BackedServer.Instance.Config.DynamicBuffers)
-                {
-                    int totalSent = 0;
-                    int dataLeft = dataToSend.Length;
-                writeData:
-                    dataLeft = dataToSend.Length - totalSent;
-                    this._client.WriteAsync(base.ToBytes(), totalSent, dataLeft < BackedServer.Instance.Config.WriteBuffer ? dataLeft : BackedServer.Instance.Config.WriteBuffer, _cancellationToken);
-                    totalSent += dataLeft < BackedServer.Instance.Config.WriteBuffer ? dataLeft : BackedServer.Instance.Config.WriteBuffer;
-                    if (dataLeft != 0)
-                        goto writeData;
-
-                    return;
-                }
-
                 // write data to client
-                this._client.WriteAsync(base.ToBytes(), cancellationToken: _cancellationToken);
+                this.FinishRequest();
             }
             catch (InvalidOperationException)
             {
@@ -269,26 +165,6 @@ namespace BackedFramework.Resources.HTTP
         /// <param name="content">The string content to send.</param>
         public void FinishRequest()
         {
-            var dataToSend = base.ToBytes();
-            // include buffer size support.
-            if (!BackedServer.Instance.Config.DynamicBuffers)
-            {
-                int totalSent = 0;
-                int dataLeft;
-
-            writeData:
-                dataLeft = dataToSend.Length - totalSent;
-
-                this._client.WriteAsync(base.ToBytes(), totalSent, dataLeft < BackedServer.Instance.Config.WriteBuffer ? dataLeft : BackedServer.Instance.Config.WriteBuffer, _cancellationToken);
-
-                totalSent += dataLeft < BackedServer.Instance.Config.WriteBuffer ? dataLeft : BackedServer.Instance.Config.WriteBuffer;
-
-                if (dataLeft != 0)
-                    goto writeData;
-
-                return;
-            }
-
             // write data to client
             this._client.WriteAsync(base.ToBytes(), cancellationToken: _cancellationToken);
         }
@@ -320,14 +196,19 @@ namespace BackedFramework.Resources.HTTP
             base.Headers.Add("Set-Cookie", cookie.ToString());
         }
 
-        public void Dispose()
+        public new void Dispose()
         {
+            if (OnRequestFinished is not null)
+                OnRequestFinished.Invoke();
+            
             Logger.Log(Logger.LogLevel.Info, $"The server sent a connection: {base.Headers["Connection"]} value.");
             Logger.Log(Logger.LogLevel.Debug, $"Request completed at {this._requestContext.Path}, there are currently: {_instanceCount} requests in progress and there are {_instanceCount - 1} zombie requests.");
 
             //ConnectionManager._instance.RemoveConnection(_requestContext.RequestHeaders["Host"]);
 
             _instanceCount--;
+
+            base.Dispose();
 
             GC.Collect();
             GC.SuppressFinalize(this);

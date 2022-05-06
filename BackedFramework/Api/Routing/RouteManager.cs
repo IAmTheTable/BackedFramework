@@ -27,7 +27,7 @@ namespace BackedFramework.Api.Routing
         /// Static instance of the RouteManager if I need to use it in another class.
         /// </summary>
         internal static RouteManager s_instance;
-        
+
         /// <summary>
         /// A dictionary of all specified routes.
         /// </summary>
@@ -123,7 +123,7 @@ namespace BackedFramework.Api.Routing
                 {
                     controller = _routingInstances[targetRouteClass];
                 }
-                
+
                 // define controller contexts.
                 controller.Response = rspCtx;
                 controller.Request = reqCtx;
@@ -156,6 +156,47 @@ namespace BackedFramework.Api.Routing
                             var functions = targetRouteFunc.Item2.ToList();
                             var targFuncName = $"/{functionName}";
                             var targetFunc = functions.Find(x => x.CustomAttributes.Any() && x.GetCustomAttribute<RouteAttribute>().Route == targFuncName);
+
+                            // get function parameter information.
+                            var parameters = targetFunc.GetParameters();
+
+                            if (parameters.Length == 0)
+                            {
+                                targetFunc.Invoke(controller, Array.Empty<object>());
+                                return true;
+                            }
+
+                            // check if the request is a queried request.
+                            if (reqCtx.IsQueried)
+                            {
+                                List<object> parametersToPass = new();
+                                foreach (var param in parameters)
+                                {
+                                    // get name and type info
+                                    var name = param.Name;
+                                    var type = param.ParameterType;
+
+                                    // validate that the name exists
+                                    if (!reqCtx.QueryParameters.ContainsKey(name))
+                                        continue;
+
+                                    // get the value of the parameter
+                                    var value = reqCtx.QueryParameters[name];
+                                    // convert the base type
+                                    var res = Convert.ChangeType(value, type);
+                                    // add them to the list
+                                    parametersToPass.Add(res);
+                                }
+
+                                if (parametersToPass.Count > 0)
+                                    targetFunc.Invoke(controller, parametersToPass.ToArray()); // invoke the function with parameters
+                                else
+                                    targetFunc.Invoke(controller, Array.CreateInstance(typeof(object), parameters.Length).Cast<object>().ToArray()); // invoke the function without parameters
+                                
+                                return true;
+                            }
+
+                            // invoke the function without parameters
                             targetFunc.Invoke(controller, Array.Empty<object>());
                             return true;
                         }
@@ -177,7 +218,11 @@ namespace BackedFramework.Api.Routing
                         }
 
                         // execute the default function.
-                        targetRouteFunc.Item2.ToList().Find(x => x.Name.ToLower() == functionName.ToLower()).Invoke(controller, Array.Empty<object>());
+                        // INFO: This is a security issue, and a small bug, but it will be fixed later.
+                        //targetRouteFunc.Item2.ToList().Find(x => x.Name.ToLower() == functionName.ToLower()).Invoke(controller, Array.Empty<object>());
+
+                        // solving the issue, temporarily, send a 404.
+                        rspCtx.SendNotFound();
                     }
                 }
                 catch

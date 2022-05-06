@@ -1,17 +1,12 @@
 ﻿global using System.Net;
 global using System.Net.Sockets;
 
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Runtime.InteropServices;
 using System.Text;
 using BackedFramework.Api.Routing;
 using BackedFramework.Resources.Exceptions;
 using BackedFramework.Resources.HTTP;
 using BackedFramework.Resources.Logging;
-using BackedFramework.Resources.Statistics;
 
 using Thread = BackedFramework.Resources.Extensions.Thread;
 using TcpListener = BackedFramework.Resources.Extensions.TcpListener;
@@ -117,9 +112,11 @@ namespace BackedFramework.Server
              * EX; ROUTE MANAGER, CONNECTION MANAGER, THREAD MANAGER, ETC
              */
 
+            // configure the thread pool to use the number of threads specified in the config
+            ThreadPool.SetMaxThreads(this.Config.MaxThreads, this.Config.MaxThreads);
+
             // will be automatically disposed upon leaving the current scope
             using var x = new RouteManager();
-            ConnectionManager.Initialize();
 
             // start the server
             this._server.Start();
@@ -127,26 +124,18 @@ namespace BackedFramework.Server
             // accept connections
             this._server.BeginAcceptTcpClient(OnClientRequestConnection);
 
-            /*new Thread(async () =>
-            {
-                while (true)
-                {
-                    if (!this._server.Pending())
-                        continue;
-
-
-                    //var client = await this._server.AcceptTcpClientAsync();
-                    //ClientConnect.Invoke(client);
-                }
-            }).Start();*/
-
             System.Threading.Thread.Sleep(-1);
         }
 
+        /// <summary>
+        /// Called when a client attempts to connect to the server.
+        /// </summary>
+        /// <param name="ar"></param>
         private void OnClientRequestConnection(IAsyncResult ar)
         {
             try
             {
+                // continuously accept connections and handle them.
                 var client = this._server.EndAcceptTcpClient(ar);
                 ClientConnect.Invoke(client);
                 this._server.BeginAcceptTcpClient(OnClientRequestConnection, null);
@@ -157,20 +146,24 @@ namespace BackedFramework.Server
             }
         }
 
-        private static void OnClientRequest(TcpClient ip, HTTPParser parser)
+        /// <summary>
+        /// Called when a client requests a resource from the server.
+        /// </summary>
+        /// <param name="client">The TcpClient that requests the resource.</param>
+        /// <param name="parser">Http parser instance that contains information about the request.</param>
+        /// <exception cref="Exception"></exception>
+        private static void OnClientRequest(TcpClient client, HTTPParser parser)
         {
             //Console.WriteLine($"Current thread context: {Environment.CurrentManagedThreadId}");
 
             using RequestContext reqCtx = new(parser);
             using ResponseContext rspCtx = new();
             rspCtx.DefineRequestContext(reqCtx);
-            rspCtx.DefineClient(ip); // set the client for the response context.
+            rspCtx.DefineClient(client); // set the client for the response context.
 
             // add keep alive connection stuff to the response context, will move into the class later
 
-            if (reqCtx.RequestHeaders.ContainsKey("Connection"))
-                if (reqCtx.RequestHeaders["Connection"] == "keep-alive")
-                    rspCtx.Headers.Add("Connection", "close");
+            rspCtx.Headers.Add("Connection", "close");
 
             // run the request through the route manager
             if (!RouteManager.s_instance.TryExecuteRoute(parser, rspCtx, reqCtx))
@@ -183,15 +176,20 @@ namespace BackedFramework.Server
 #endif
                 // maybe log failed requests...
             }
+            client.Dispose();
         }
 
+        /// <summary>
+        /// Called when a client is connected to the server.
+        /// </summary>
+        /// <param name="client"></param>
         private static void OnClientConnectTest(TcpClient client)
         {
             // handle fixed buffers
             if (!BackedServer.Instance.Config.DynamicBuffers)
             {
-                // TODO: add fixed buffer support later.
-                return;
+                client.ReceiveBufferSize = BackedServer.Instance.Config.WriteBuffer;
+                client.SendBufferSize = BackedServer.Instance.Config.ReadBuffer;
             }
 
             while (client.Available == 0)
@@ -199,77 +197,11 @@ namespace BackedFramework.Server
                 System.Threading.Thread.Sleep(1);
             }
 
-            ConnectionManager._instance.AddConnection(client);
-
-            // allocate buffer and start reading from the client
-            var buffer = new byte[client.Available];
-            client.GetStream().BeginRead(buffer, 0, buffer.Length, OnDataRecieved, null);
-
-            // Function to handle the data recieved from the client.
-            void OnDataRecieved(IAsyncResult result)
+            client.ReadData((byte[] data) =>
             {
-                var countDataRecieved = client.GetStream().EndRead(result);
-                // check if the data matches...
-                if (buffer.Length == countDataRecieved)
-                {
-                    Logger.Log(Logger.LogLevel.Debug, "Successfully read data from client.");
-                    // convert the buffer into an instance of HTTPParser, then invoke the client request event.
-                    using HTTPParser parser = new(Encoding.UTF8.GetString(buffer));
-                    ClientRequest.Invoke(client, parser);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Called when a client connects to the server.
-        /// </summary>
-        /// <param name="client">The TcpClient instance of the client that connects to the server.</param>
-        /// <returns>None</returns>
-        /// TODO: Make sure to handle the threading...
-        private static void OnClientConnect(TcpClient client)
-        {
-            //Console.WriteLine($"Current thread context: {Environment.CurrentManagedThreadId}");
-            using StatisticsManager statManager = new();
-            new Thread(async () =>
-            {
-                var clientStream = client.GetStream();
-
-                while (client.Available < 1)
-                {
-                    await Task.Delay(1);
-                    Logger.Log(Logger.LogLevel.Debug, "Waiting for client to send data...");
-                }
-
-                // determine the buffer size per request
-                var bufferSize = Instance.Config.DynamicBuffers ? client.Available : Instance.Config.ReadBuffer;
-#if DEBUG
-                statManager.Start(); // get statistics
-#endif
-                // allocate the buffer
-                var buffer = new byte[bufferSize];
-                var totalRead = await clientStream.ReadAsync(buffer);
-
-            // if we havent read all the data already, then continue to read the buffer.
-            readData:
-                if (client.Available != 0)
-                {
-                    var nextToRead = client.Available - totalRead;
-                    var oldRead = totalRead;
-                    Array.Resize(ref buffer, buffer.Length + bufferSize);
-                    totalRead += await clientStream.ReadAsync(buffer, oldRead, bufferSize);
-                    goto readData;
-                }
-                Array.Resize(ref buffer, totalRead);
-
-#if DEBUG
-                //Console.WriteLine($"Current thread context: {Environment.CurrentManagedThreadId}");
-                statManager.End();
-                statManager.PrintTiming();
-#endif
-
-                using HTTPParser parser = new(Encoding.UTF8.GetString(buffer));
+                using HTTPParser parser = new(Encoding.UTF8.GetString(data));
                 ClientRequest.Invoke(client, parser);
-            }).Start();
+            });
         }
     }
 }
