@@ -31,9 +31,11 @@ namespace TestProject
     public class Base : BaseController
     {
         [Route("/", BackedFramework.Resources.HTTP.HTTPMethods.GET)]
-        public void Index()
+        public void Index(string name = "World!")
         {
-            base.Response.SendFile(true, "index.html");
+            base.Response.Write($"Hello {name}");
+            base.Response.FinishRequest();
+            //base.Response.SendFile(true, "index.html");
         }
         
         [Route("/img", BackedFramework.Resources.HTTP.HTTPMethods.GET)]

@@ -141,8 +141,16 @@ namespace BackedFramework.Api.Routing
                             return true;
                         }
 
+                        var queryParams = Array.CreateInstance(typeof(object), targetRouteFunc.Item2.First(x => x.Name.ToLower() == "index").GetParameters().Length).Cast<object>().ToArray();
+                        
+                        if(reqCtx.IsQueried)
+                        {
+                            for (int i = 0; i < queryParams.Length; i++)
+                                queryParams[0] = reqCtx.QueryParameters.Values.ElementAt(i);
+                        }
+
                         // invoke the Index function for the client to recieve.
-                        targetRouteClass.GetMethod("Index").Invoke(controller, Array.Empty<object>());
+                        targetRouteClass.GetMethod("Index").Invoke(controller, queryParams);
                         return true;
                     }
                     else
@@ -160,6 +168,7 @@ namespace BackedFramework.Api.Routing
                             // get function parameter information.
                             var parameters = targetFunc.GetParameters();
 
+                            // if the function has no parameters just execute it normally.
                             if (parameters.Length == 0)
                             {
                                 targetFunc.Invoke(controller, Array.Empty<object>());
@@ -187,7 +196,7 @@ namespace BackedFramework.Api.Routing
                                     // add them to the list
                                     parametersToPass.Add(res);
                                 }
-
+                                // check the parameter count, if it is not the same then just invoke the function without the parameters.
                                 if (parametersToPass.Count > 0)
                                     targetFunc.Invoke(controller, parametersToPass.ToArray()); // invoke the function with parameters
                                 else
@@ -236,6 +245,7 @@ namespace BackedFramework.Api.Routing
             }
             else
             {
+                // validate the file exists.
                 if (File.Exists(BackedServer.Instance.Config.RootDirectory + "/" + path))
                 {
                     // send the file

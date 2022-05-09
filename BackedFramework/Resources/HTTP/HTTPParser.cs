@@ -38,12 +38,13 @@ namespace BackedFramework.Resources.HTTP
                 Logger.Log(Logger.LogLevel.Error, "Failed parse HTTP packet, input is null or empty.");
                 return;
             }
+
             // remove all /r Format from Input
             Input = Input.Replace("\r", "");
             // convert each line as a "header"
             var lines = Input.Split('\n');
             this.Method = lines[0].Split(' ')[0]; // extract the HTTP methods
-            this.Url = lines[0].Split(' ')[1]; // extract the url 
+            this.Url = System.Web.HttpUtility.UrlDecode(lines[0].Split(' ')[1]);  // extract the url 
             this.Version = lines[0].Split(' ')[2]; // extract the HTTP version
 
             // extract query parameters if they exist
@@ -54,24 +55,25 @@ namespace BackedFramework.Resources.HTTP
                 // split the queried string...
                 var query = Url.Split('?')[1];
                 var query_params = query.Split('&');
-                
+
                 // iterate the queried strings...
                 foreach (var param in query_params)
                 {
                     // retrieve the key value pairs
 
-                    if(param.Split('=').Length < 2)
+                    if (param.Split('=').Length < 2)
                     {
                         this.QueryParameters.Add(param.Split('=')[0], "");
                         continue;
                     }
-
+                    // get the key value pairs
                     var key = param.Split('=')[0];
                     var value = param.Split('=')[1];
+
                     // add the values to the query parameters dictionary
                     QueryParameters.Add(key, value);
                 }
-                
+
                 // fix the url because it still contians the url parameters
                 this.Url = Url.Split('?')[0];
             }
@@ -170,7 +172,7 @@ namespace BackedFramework.Resources.HTTP
         /// A key/value pair for query string parameters.
         /// </summary>
         public Dictionary<string, string> QueryParameters { get; internal set; } = new();
-        
+
         /// <summary>
         /// boundary usage for multipart/form-data request types
         /// </summary>

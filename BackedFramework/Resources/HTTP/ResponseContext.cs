@@ -29,6 +29,11 @@ namespace BackedFramework.Resources.HTTP
             });
         }
 
+        /// <summary>
+        /// The request context that this response is associated with.
+        /// </summary>
+        /// <param name="ctx">Context that will be used with the request...</param>
+        /// <remarks>Only used for future use, if any...</remarks>
         internal void DefineRequestContext(RequestContext ctx) => this._requestContext = ctx;
 
         /// <summary>
@@ -57,6 +62,23 @@ namespace BackedFramework.Resources.HTTP
             // write data to client
             this._client.WriteAsync(base.ToBytes(), cancellationToken: _cancellationToken);
         }
+
+        /// <summary>
+        /// Write data to the client.
+        /// </summary>
+        /// <param name="Text">The text to write. Can be any object as long as it converts to a string how YOU want.</param>
+        public void Write(object Text) => base.Content = Text.ToString();
+
+        /// <summary>
+        /// Append text content to the response.
+        /// </summary>
+        /// <param name="Text">The text to append.</param>
+        public void Append(object Text) => base.Content += Text.ToString();
+
+        /// <summary>
+        /// Remove all the data out of the content.
+        /// </summary>
+        public void Clear() => base.Content = "";
 
         /// <summary>
         /// Send a file to the client, includes the HTTP header.
