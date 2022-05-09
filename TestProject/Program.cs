@@ -21,7 +21,7 @@ namespace TestProject
                 WriteBuffer = 10,
             });
 
-            while(true)
+            while (true)
             {
                 Console.Title = $"{BackedServer.Instance.Config.ServerName} | ThreadCount: {ThreadPool.ThreadCount} | PendingThreads: {ThreadPool.PendingWorkItemCount}";
             }
@@ -33,11 +33,18 @@ namespace TestProject
         [Route("/", BackedFramework.Resources.HTTP.HTTPMethods.GET)]
         public void Index(string name = "World!")
         {
-            base.Response.Write($"Hello {name}");
-            base.Response.FinishRequest();
-            //base.Response.SendFile(true, "index.html");
+            //base.Response.Write($"Hello {name}");
+            // base.Response.FinishRequest();
+            base.Response.SendFile(true, "index.html");
         }
-        
+
+        [Route("/post", BackedFramework.Resources.HTTP.HTTPMethods.POST)]
+        public void Post(string firstName, string lastName, string schoolName)
+        {
+            base.Response.Write($"Hello {firstName} {lastName} from {schoolName}.");
+            base.Response.FinishRequest();
+        }
+
         [Route("/img", BackedFramework.Resources.HTTP.HTTPMethods.GET)]
         public void ImageRequest()
         {
@@ -48,10 +55,10 @@ namespace TestProject
         [Route("/home", BackedFramework.Resources.HTTP.HTTPMethods.GET)]
         public void Func()
         {
-            base.Response.SendFile(true, "what"); 
+            base.Response.SendFile(true, "what");
         }
 
-        
+
     }
 
 
@@ -64,7 +71,7 @@ namespace TestProject
         {
             base.Response.SendFile(true, "index.html");
         }
-        
+
         public void NotIndex()
         {
             base.Response.Content = "Not Hello World.";

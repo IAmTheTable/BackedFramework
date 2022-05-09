@@ -150,9 +150,9 @@ namespace BackedFramework.Resources.HTTP
                     // compare content type or content length, each useful for form data replies and whatnot
                     if (key == "Content-Type")
                     {
-                        if (value.StartsWith(" multipart/form-data"))
+                        if (value.StartsWith("multipart/form-data"))
                             this.Boundary = value.Split('=')[1]; // extract the boundary from the HTTP request
-                        else if (value.StartsWith(" application/x-www-form-urlencoded"))
+                        else if (value.StartsWith("application/x-www-form-urlencoded"))
                             formUrlEnc = true; // enable form url encoded mode
                     }
                     else if (key == "Content-Length")
@@ -202,7 +202,7 @@ namespace BackedFramework.Resources.HTTP
         /// <summary>
         /// HTTP version of the request
         /// </summary>
-        public string Version { get; internal set; } = "HTTP/2";
+        public string Version { get; internal set; } = "HTTP/1.1";
         /// <summary>
         /// HTTP Status code for the request response
         /// </summary>
@@ -225,7 +225,7 @@ namespace BackedFramework.Resources.HTTP
             sb.Append($"{Version} {Code} {Message}\r\n");
             foreach (var header in Headers)
             {
-                sb.Append(header.Key + ": " + header.Value + "\n");
+                sb.Append(header.Key + ": " + header.Value + "\r\n");
             }
             sb.Append("\r\n" + Content + "\r\n\r\n");
             return sb.ToString();

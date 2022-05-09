@@ -99,7 +99,7 @@ namespace BackedFramework.Api.Routing
             {
                 // try and get the route from the function route directory.
                 var routeResult = _functionRoutes.Keys.Where(x => x.HTTPMethod == method && x.Route == path).ToList();
-                if (routeResult is null)
+                if (routeResult is null || routeResult.Count == 0)
                 {
                     rspCtx.SendNotFound();
                     return true; // invalid request, handle later.
@@ -136,6 +136,17 @@ namespace BackedFramework.Api.Routing
                         var hasIndex = targetRouteFunc.Item2.ToList().Any(x => x.Name.ToLower() == "index");
                         if (!hasIndex)
                         {
+
+                            if(targetRouteFunc.Item2.Length == 1)
+                            {
+                                var _queryParams = Array.CreateInstance(typeof(object), targetRouteFunc.Item2[0].GetParameters().Length).Cast<object>().ToArray();
+
+                                for (int i = 0; i < _queryParams.Length; i++)
+                                    _queryParams[i] = reqCtx.FormData.Values.ElementAt(i);
+
+                                    targetRouteFunc.Item2[0].Invoke(targetRouteClass, _queryParams.ToArray());
+                            }
+                            
                             // send the 404
                             rspCtx.SendNotFound();
                             return true;
