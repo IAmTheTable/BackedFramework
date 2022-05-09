@@ -15,11 +15,16 @@ namespace TestProject
                 ApiVersion = "v4.20",
                 RootDirectory = @"C:\Users\asanc052\Desktop\Work\FamilyWebsite\School_HtmlFamilyProject",
                 UseMultiThreading = true,
-                MaxThreads = -1,
+                MaxThreads = 1,
                 DynamicBuffers = true,
                 ReadBuffer = 10,
                 WriteBuffer = 10,
             });
+
+            while(true)
+            {
+                Console.Title = $"{BackedServer.Instance.Config.ServerName} | ThreadCount: {ThreadPool.ThreadCount} | PendingThreads: {ThreadPool.PendingWorkItemCount}";
+            }
         }
     }
 
@@ -52,7 +57,7 @@ namespace TestProject
     [Route("/test", BackedFramework.Resources.HTTP.HTTPMethods.GET)]
     public class Home : BaseController
     {
-        [Route("/cool", BackedFramework.Resources.HTTP.HTTPMethods.GET)]
+        [Route("/cool/index/", BackedFramework.Resources.HTTP.HTTPMethods.GET)]
         public void Index()
         {
             base.Response.SendFile(true, "index.html");

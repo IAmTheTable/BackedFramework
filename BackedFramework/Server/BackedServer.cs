@@ -8,9 +8,9 @@ using BackedFramework.Resources.Exceptions;
 using BackedFramework.Resources.HTTP;
 using BackedFramework.Resources.Logging;
 
-using Thread = BackedFramework.Resources.Extensions.Thread;
 using TcpListener = BackedFramework.Resources.Extensions.TcpListener;
 using TcpClient = BackedFramework.Resources.Extensions.TcpClient;
+using BackedFramework.Resources.Extensions;
 
 namespace BackedFramework.Server
 {
@@ -117,14 +117,12 @@ namespace BackedFramework.Server
 
             // will be automatically disposed upon leaving the current scope
             using var x = new RouteManager();
-
+            
             // start the server
             this._server.Start();
 
             // accept connections
             this._server.BeginAcceptTcpClient(OnClientRequestConnection);
-
-            System.Threading.Thread.Sleep(-1);
         }
 
         /// <summary>
@@ -133,17 +131,20 @@ namespace BackedFramework.Server
         /// <param name="ar"></param>
         private void OnClientRequestConnection(IAsyncResult ar)
         {
-            try
+            new Thread(() =>
             {
-                // continuously accept connections and handle them.
-                var client = this._server.EndAcceptTcpClient(ar);
-                ClientConnect.Invoke(client);
-                this._server.BeginAcceptTcpClient(OnClientRequestConnection, null);
-            }
-            catch (Exception e)
-            {
-                Logger.Log(Logger.LogLevel.Error, e.Message);
-            }
+                try
+                {
+                    // continuously accept connections and handle them.
+                    var client = this._server.EndAcceptTcpClient(ar);
+                    ClientConnect.Invoke(client);
+                    this._server.BeginAcceptTcpClient(OnClientRequestConnection, null);
+                }
+                catch (Exception e)
+                {
+                    Logger.Log(Logger.LogLevel.Error, e.Message);
+                }
+            }).Start();
         }
 
         /// <summary>
@@ -151,7 +152,6 @@ namespace BackedFramework.Server
         /// </summary>
         /// <param name="client">The TcpClient that requests the resource.</param>
         /// <param name="parser">Http parser instance that contains information about the request.</param>
-        /// <exception cref="Exception"></exception>
         private static void OnClientRequest(TcpClient client, HTTPParser parser)
         {
             //Console.WriteLine($"Current thread context: {Environment.CurrentManagedThreadId}");
