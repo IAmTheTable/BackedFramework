@@ -137,24 +137,25 @@ namespace BackedFramework.Api.Routing
                         if (!hasIndex)
                         {
 
-                            if(targetRouteFunc.Item2.Length == 1)
+                            if (targetRouteFunc.Item2.Length == 1)
                             {
                                 var _queryParams = Array.CreateInstance(typeof(object), targetRouteFunc.Item2[0].GetParameters().Length).Cast<object>().ToArray();
 
                                 for (int i = 0; i < _queryParams.Length; i++)
-                                    _queryParams[i] = reqCtx.FormData.Values.ElementAt(i);
+                                    _queryParams[i] = reqCtx.FormData.Values.ElementAt(i).Cast<object>();
 
-                                    targetRouteFunc.Item2[0].Invoke(targetRouteClass, _queryParams.ToArray());
+                                targetRouteFunc.Item2[0].Invoke(targetRouteClass, _queryParams);
+                                return true;
                             }
-                            
+
                             // send the 404
                             rspCtx.SendNotFound();
                             return true;
                         }
 
                         var queryParams = Array.CreateInstance(typeof(object), targetRouteFunc.Item2.First(x => x.Name.ToLower() == "index").GetParameters().Length).Cast<object>().ToArray();
-                        
-                        if(reqCtx.IsQueried)
+
+                        if (reqCtx.IsQueried)
                         {
                             for (int i = 0; i < queryParams.Length; i++)
                                 queryParams[0] = reqCtx.QueryParameters.Values.ElementAt(i);
@@ -189,30 +190,30 @@ namespace BackedFramework.Api.Routing
                             // check if the request is a queried request.
                             if (reqCtx.IsQueried)
                             {
-                                List<object> parametersToPass = new();
-                                foreach (var param in parameters)
-                                {
-                                    // get name and type info
-                                    var name = param.Name;
-                                    var type = param.ParameterType;
+                                    List<object> parametersToPass = new();
+                                    foreach (var param in parameters)
+                                    {
+                                        // get name and type info
+                                        var name = param.Name;
+                                        var type = param.ParameterType;
 
-                                    // validate that the name exists
-                                    if (!reqCtx.QueryParameters.ContainsKey(name))
-                                        continue;
+                                        // validate that the name exists
+                                        if (!reqCtx.QueryParameters.ContainsKey(name))
+                                            continue;
 
-                                    // get the value of the parameter
-                                    var value = reqCtx.QueryParameters[name];
-                                    // convert the base type
-                                    var res = Convert.ChangeType(value, type);
-                                    // add them to the list
-                                    parametersToPass.Add(res);
-                                }
-                                // check the parameter count, if it is not the same then just invoke the function without the parameters.
-                                if (parametersToPass.Count > 0)
-                                    targetFunc.Invoke(controller, parametersToPass.ToArray()); // invoke the function with parameters
-                                else
-                                    targetFunc.Invoke(controller, Array.CreateInstance(typeof(object), parameters.Length).Cast<object>().ToArray()); // invoke the function without parameters
-                                
+                                        // get the value of the parameter
+                                        var value = reqCtx.QueryParameters[name];
+                                        // convert the base type
+                                        var res = Convert.ChangeType(value, type);
+                                        // add them to the list
+                                        parametersToPass.Add(res);
+                                    }
+                                    // check the parameter count, if it is not the same then just invoke the function without the parameters.
+                                    if (parametersToPass.Count > 0)
+                                        targetFunc.Invoke(controller, parametersToPass.ToArray()); // invoke the function with parameters
+                                    else
+                                        targetFunc.Invoke(controller, Array.CreateInstance(typeof(object), parameters.Length).Cast<object>().ToArray()); // invoke the function without parameters
+
                                 return true;
                             }
 

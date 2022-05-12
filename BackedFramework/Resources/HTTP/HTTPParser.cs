@@ -138,7 +138,7 @@ namespace BackedFramework.Resources.HTTP
             // append the body from the end of the headers.
             headers.Skip(i).ToList().ForEach(x =>
             {
-                this.Body += (x == "" ? '' : x + '\n');
+                this.Body += (x == "" ? "" : x + '\n');
             });
 
             this.Body = this.Body.Substring(0, this.Body.Length - 1);
