@@ -39,9 +39,15 @@ namespace TestProject
         }
 
         [Route("/post", BackedFramework.Resources.HTTP.HTTPMethods.POST)]
-        public void Post(string firstName, string lastName, string schoolName)
+        public void Post(string value)
         {
-            base.Response.Write($"Hello {firstName} {lastName} from {schoolName}.");
+            base.Response.AddHeader("title", "HAHAHAH SKID");
+
+            var data = File.ReadAllText(BackedServer.Instance.Config.RootDirectory + "/test.html");
+            data = data.Replace("||", value); // replace our placeholder with the value
+
+            base.Response.Write(data);
+
             base.Response.FinishRequest();
         }
 

@@ -149,6 +149,18 @@ namespace BackedFramework.Resources.HTTP
             }
         }
 
+
+        /// <summary>
+        /// Wrapper for decoding HTML encoded strings.
+        /// </summary>
+        /// <param name="input">Input string to decode</param>
+        /// <returns>The HTML decoded string.</returns>
+        private string HtmlDecode(string input) => System.Net.WebUtility.UrlDecode(input);
+
+        /// <summary>
+        /// parse multipart form data post requests via remaining headers.
+        /// </summary>
+        /// <param name="headers">List of headers to use for parsing...</param>
         private void parseMultipartBody(List<string> headers)
         {
             int i = 0;
@@ -189,7 +201,7 @@ namespace BackedFramework.Resources.HTTP
                 if ((x != this.Boundary && x != this.Boundary + "--") && !end) // not boundary and not end
                 {
                     data = true;
-                    sectionData += (x == "" ? "" : x + '\n');
+                    sectionData += (x == "" ? "" : x);
                 }
                 else if ((x == this.Boundary || x == this.Boundary + "--") && data) // boundary and (not end and data) - was able to read data
                 {
@@ -206,13 +218,19 @@ namespace BackedFramework.Resources.HTTP
                     var dataName = sectionData.Split("name=\"")[1].Split('"')[0];
                     var dataResult = sectionData.Split("name=\"")[1].Split('"')[1];
 
-                    this.FormData.Add(dataName, dataResult);
+                    var result = HtmlDecode(dataResult);
+
+                    this.FormData.Add(dataName, result);
 
                     sectionData = "";
                 }
             });
         }
 
+        /// <summary>
+        /// Parse url encoded form data post requests via remaining headers.
+        /// </summary>
+        /// <param name="headers">The remaining headers to use when parsing.</param>
         private void parseUrlEncodedBody(List<string> headers)
         {
             int i = 0;
@@ -234,7 +252,9 @@ namespace BackedFramework.Resources.HTTP
             {
                 var y = x.Split('='); // split the header to get the key and value
 
-                this.FormData.Add(y[0], y[1]); // add the key values to the form data dictionary
+                var res = HtmlDecode(y[1]);
+
+                this.FormData.Add(y[0], res); // add the key values to the form data dictionary
             });
         }
 

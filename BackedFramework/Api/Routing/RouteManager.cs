@@ -136,15 +136,36 @@ namespace BackedFramework.Api.Routing
                         var hasIndex = targetRouteFunc.Item2.ToList().Any(x => x.Name.ToLower() == "index");
                         if (!hasIndex)
                         {
-
                             if (targetRouteFunc.Item2.Length == 1)
                             {
-                                var _queryParams = Array.CreateInstance(typeof(object), targetRouteFunc.Item2[0].GetParameters().Length).Cast<object>().ToArray();
+                                // get function parameters so we can cast each object type...
+                                var parameters = targetRouteFunc.Item2[0].GetParameters();
+                                var targetFunc = targetRouteFunc.Item2[0];
 
-                                for (int i = 0; i < _queryParams.Length; i++)
-                                    _queryParams[i] = reqCtx.FormData.Values.ElementAt(i).Cast<object>();
+                                List<object> parametersToPass = new();
+                                foreach (var param in parameters)
+                                {
+                                    // get name and type info
+                                    var name = param.Name;
+                                    var type = param.ParameterType;
 
-                                targetRouteFunc.Item2[0].Invoke(targetRouteClass, _queryParams);
+                                    // validate that the name exists
+                                    if (!reqCtx.FormData.ContainsKey(name))
+                                        continue;
+
+                                    // get the value of the parameter
+                                    var value = reqCtx.FormData[name];
+                                    // convert the base type
+                                    var res = Convert.ChangeType(value, type);
+                                    // add them to the list
+                                    parametersToPass.Add(res);
+                                }
+                                // check the parameter count, if it is not the same then just invoke the function without the parameters.
+                                if (parametersToPass.Count > 0)
+                                    targetFunc.Invoke(controller, parametersToPass.ToArray()); // invoke the function with parameters
+                                else
+                                    targetFunc.Invoke(controller, Array.CreateInstance(typeof(object), parameters.Length).Cast<object>().ToArray()); // invoke the function without parameters
+
                                 return true;
                             }
 
