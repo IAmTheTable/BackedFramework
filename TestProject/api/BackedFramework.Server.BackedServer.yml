@@ -1,0 +1,481 @@
+### YamlMime:ManagedReference
+items:
+- uid: BackedFramework.Server.BackedServer
+  commentId: T:BackedFramework.Server.BackedServer
+  id: BackedServer
+  parent: BackedFramework.Server
+  children:
+  - BackedFramework.Server.BackedServer.Config
+  - BackedFramework.Server.BackedServer.Initialize(BackedFramework.BackedConfig)
+  - BackedFramework.Server.BackedServer.Instance
+  langs:
+  - csharp
+  - vb
+  name: BackedServer
+  nameWithType: BackedServer
+  fullName: BackedFramework.Server.BackedServer
+  type: Class
+  source:
+    remote:
+      path: BackedFramework/Server/BackedServer.cs
+      branch: master
+      repo: https://github.com/IAmTheTable/BackedFramework.git
+    id: BackedServer
+    path: ../BackedFramework/Server/BackedServer.cs
+    startLine: 16
+  assemblies:
+  - BackedFramework
+  namespace: BackedFramework.Server
+  syntax:
+    content: public class BackedServer
+    content.vb: Public Class BackedServer
+  inheritance:
+  - System.Object
+  inheritedMembers:
+  - System.Object.Equals(System.Object)
+  - System.Object.Equals(System.Object,System.Object)
+  - System.Object.GetHashCode
+  - System.Object.GetType
+  - System.Object.MemberwiseClone
+  - System.Object.ReferenceEquals(System.Object,System.Object)
+  - System.Object.ToString
+  modifiers.csharp:
+  - public
+  - class
+  modifiers.vb:
+  - Public
+  - Class
+- uid: BackedFramework.Server.BackedServer.Instance
+  commentId: P:BackedFramework.Server.BackedServer.Instance
+  id: Instance
+  parent: BackedFramework.Server.BackedServer
+  langs:
+  - csharp
+  - vb
+  name: Instance
+  nameWithType: BackedServer.Instance
+  fullName: BackedFramework.Server.BackedServer.Instance
+  type: Property
+  source:
+    remote:
+      path: BackedFramework/Server/BackedServer.cs
+      branch: master
+      repo: https://github.com/IAmTheTable/BackedFramework.git
+    id: Instance
+    path: ../BackedFramework/Server/BackedServer.cs
+    startLine: 31
+  assemblies:
+  - BackedFramework
+  namespace: BackedFramework.Server
+  summary: "\nThe static instance of the server.\n"
+  example: []
+  syntax:
+    content: public static BackedServer Instance { get; }
+    parameters: []
+    return:
+      type: BackedFramework.Server.BackedServer
+    content.vb: Public Shared ReadOnly Property Instance As BackedServer
+  overload: BackedFramework.Server.BackedServer.Instance*
+  modifiers.csharp:
+  - public
+  - static
+  - get
+  modifiers.vb:
+  - Public
+  - Shared
+  - ReadOnly
+- uid: BackedFramework.Server.BackedServer.Config
+  commentId: F:BackedFramework.Server.BackedServer.Config
+  id: Config
+  parent: BackedFramework.Server.BackedServer
+  langs:
+  - csharp
+  - vb
+  name: Config
+  nameWithType: BackedServer.Config
+  fullName: BackedFramework.Server.BackedServer.Config
+  type: Field
+  source:
+    remote:
+      path: BackedFramework/Server/BackedServer.cs
+      branch: master
+      repo: https://github.com/IAmTheTable/BackedFramework.git
+    id: Config
+    path: ../BackedFramework/Server/BackedServer.cs
+    startLine: 36
+  assemblies:
+  - BackedFramework
+  namespace: BackedFramework.Server
+  summary: "\nConfiguration instance of the server.\n"
+  example: []
+  syntax:
+    content: public BackedConfig Config
+    return:
+      type: BackedFramework.BackedConfig
+    content.vb: Public Config As BackedConfig
+  modifiers.csharp:
+  - public
+  modifiers.vb:
+  - Public
+- uid: BackedFramework.Server.BackedServer.Initialize(BackedFramework.BackedConfig)
+  commentId: M:BackedFramework.Server.BackedServer.Initialize(BackedFramework.BackedConfig)
+  id: Initialize(BackedFramework.BackedConfig)
+  parent: BackedFramework.Server.BackedServer
+  langs:
+  - csharp
+  - vb
+  name: Initialize(BackedConfig)
+  nameWithType: BackedServer.Initialize(BackedConfig)
+  fullName: BackedFramework.Server.BackedServer.Initialize(BackedFramework.BackedConfig)
+  type: Method
+  source:
+    remote:
+      path: BackedFramework/Server/BackedServer.cs
+      branch: master
+      repo: https://github.com/IAmTheTable/BackedFramework.git
+    id: Initialize
+    path: ../BackedFramework/Server/BackedServer.cs
+    startLine: 102
+  assemblies:
+  - BackedFramework
+  namespace: BackedFramework.Server
+  syntax:
+    content: public static BackedServer Initialize(BackedConfig config)
+    parameters:
+    - id: config
+      type: BackedFramework.BackedConfig
+    return:
+      type: BackedFramework.Server.BackedServer
+    content.vb: Public Shared Function Initialize(config As BackedConfig) As BackedServer
+  overload: BackedFramework.Server.BackedServer.Initialize*
+  modifiers.csharp:
+  - public
+  - static
+  modifiers.vb:
+  - Public
+  - Shared
+references:
+- uid: BackedFramework.Server
+  commentId: N:BackedFramework.Server
+  name: BackedFramework.Server
+  nameWithType: BackedFramework.Server
+  fullName: BackedFramework.Server
+- uid: System.Object
+  commentId: T:System.Object
+  parent: System
+  isExternal: true
+  name: Object
+  nameWithType: Object
+  fullName: System.Object
+- uid: System.Object.Equals(System.Object)
+  commentId: M:System.Object.Equals(System.Object)
+  parent: System.Object
+  isExternal: true
+  name: Equals(Object)
+  nameWithType: Object.Equals(Object)
+  fullName: System.Object.Equals(System.Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    nameWithType: Object.Equals
+    fullName: System.Object.Equals
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    nameWithType: Object.Equals
+    fullName: System.Object.Equals
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System.Object.Equals(System.Object,System.Object)
+  commentId: M:System.Object.Equals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  name: Equals(Object, Object)
+  nameWithType: Object.Equals(Object, Object)
+  fullName: System.Object.Equals(System.Object, System.Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    nameWithType: Object.Equals
+    fullName: System.Object.Equals
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    nameWithType: Object.Equals
+    fullName: System.Object.Equals
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System.Object.GetHashCode
+  commentId: M:System.Object.GetHashCode
+  parent: System.Object
+  isExternal: true
+  name: GetHashCode()
+  nameWithType: Object.GetHashCode()
+  fullName: System.Object.GetHashCode()
+  spec.csharp:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    nameWithType: Object.GetHashCode
+    fullName: System.Object.GetHashCode
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    nameWithType: Object.GetHashCode
+    fullName: System.Object.GetHashCode
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System.Object.GetType
+  commentId: M:System.Object.GetType
+  parent: System.Object
+  isExternal: true
+  name: GetType()
+  nameWithType: Object.GetType()
+  fullName: System.Object.GetType()
+  spec.csharp:
+  - uid: System.Object.GetType
+    name: GetType
+    nameWithType: Object.GetType
+    fullName: System.Object.GetType
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.Object.GetType
+    name: GetType
+    nameWithType: Object.GetType
+    fullName: System.Object.GetType
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System.Object.MemberwiseClone
+  commentId: M:System.Object.MemberwiseClone
+  parent: System.Object
+  isExternal: true
+  name: MemberwiseClone()
+  nameWithType: Object.MemberwiseClone()
+  fullName: System.Object.MemberwiseClone()
+  spec.csharp:
+  - uid: System.Object.MemberwiseClone
+    name: MemberwiseClone
+    nameWithType: Object.MemberwiseClone
+    fullName: System.Object.MemberwiseClone
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.Object.MemberwiseClone
+    name: MemberwiseClone
+    nameWithType: Object.MemberwiseClone
+    fullName: System.Object.MemberwiseClone
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System.Object.ReferenceEquals(System.Object,System.Object)
+  commentId: M:System.Object.ReferenceEquals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  name: ReferenceEquals(Object, Object)
+  nameWithType: Object.ReferenceEquals(Object, Object)
+  fullName: System.Object.ReferenceEquals(System.Object, System.Object)
+  spec.csharp:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    nameWithType: Object.ReferenceEquals
+    fullName: System.Object.ReferenceEquals
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    nameWithType: Object.ReferenceEquals
+    fullName: System.Object.ReferenceEquals
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System.Object.ToString
+  commentId: M:System.Object.ToString
+  parent: System.Object
+  isExternal: true
+  name: ToString()
+  nameWithType: Object.ToString()
+  fullName: System.Object.ToString()
+  spec.csharp:
+  - uid: System.Object.ToString
+    name: ToString
+    nameWithType: Object.ToString
+    fullName: System.Object.ToString
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.Object.ToString
+    name: ToString
+    nameWithType: Object.ToString
+    fullName: System.Object.ToString
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System
+  commentId: N:System
+  isExternal: true
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: BackedFramework.Server.BackedServer.Instance*
+  commentId: Overload:BackedFramework.Server.BackedServer.Instance
+  name: Instance
+  nameWithType: BackedServer.Instance
+  fullName: BackedFramework.Server.BackedServer.Instance
+- uid: BackedFramework.Server.BackedServer
+  commentId: T:BackedFramework.Server.BackedServer
+  parent: BackedFramework.Server
+  name: BackedServer
+  nameWithType: BackedServer
+  fullName: BackedFramework.Server.BackedServer
+- uid: BackedFramework.BackedConfig
+  commentId: T:BackedFramework.BackedConfig
+  parent: BackedFramework
+  name: BackedConfig
+  nameWithType: BackedConfig
+  fullName: BackedFramework.BackedConfig
+- uid: BackedFramework
+  commentId: N:BackedFramework
+  name: BackedFramework
+  nameWithType: BackedFramework
+  fullName: BackedFramework
+- uid: BackedFramework.Server.BackedServer.Initialize*
+  commentId: Overload:BackedFramework.Server.BackedServer.Initialize
+  name: Initialize
+  nameWithType: BackedServer.Initialize
+  fullName: BackedFramework.Server.BackedServer.Initialize

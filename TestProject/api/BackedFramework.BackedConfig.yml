@@ -1,0 +1,1006 @@
+### YamlMime:ManagedReference
+items:
+- uid: BackedFramework.BackedConfig
+  commentId: T:BackedFramework.BackedConfig
+  id: BackedConfig
+  parent: BackedFramework
+  children:
+  - BackedFramework.BackedConfig.#ctor
+  - BackedFramework.BackedConfig.#ctor(BackedFramework.BackedConfig)
+  - BackedFramework.BackedConfig.ApiPath
+  - BackedFramework.BackedConfig.ApiVersion
+  - BackedFramework.BackedConfig.ConnectionTimeout
+  - BackedFramework.BackedConfig.DynamicBuffers
+  - BackedFramework.BackedConfig.ListeningPort
+  - BackedFramework.BackedConfig.MaxThreads
+  - BackedFramework.BackedConfig.ReadBuffer
+  - BackedFramework.BackedConfig.RootDirectory
+  - BackedFramework.BackedConfig.ServerName
+  - BackedFramework.BackedConfig.SSLPath
+  - BackedFramework.BackedConfig.UseMultiThreading
+  - BackedFramework.BackedConfig.UseSSL
+  - BackedFramework.BackedConfig.WriteBuffer
+  langs:
+  - csharp
+  - vb
+  name: BackedConfig
+  nameWithType: BackedConfig
+  fullName: BackedFramework.BackedConfig
+  type: Class
+  source:
+    remote:
+      path: BackedFramework/BackedConfig.cs
+      branch: master
+      repo: https://github.com/IAmTheTable/BackedFramework.git
+    id: BackedConfig
+    path: ../BackedFramework/BackedConfig.cs
+    startLine: 5
+  assemblies:
+  - BackedFramework
+  namespace: BackedFramework
+  summary: "\nThe configuration class for the framework.\n"
+  example: []
+  syntax:
+    content: public class BackedConfig
+    content.vb: Public Class BackedConfig
+  inheritance:
+  - System.Object
+  inheritedMembers:
+  - System.Object.Equals(System.Object)
+  - System.Object.Equals(System.Object,System.Object)
+  - System.Object.GetHashCode
+  - System.Object.GetType
+  - System.Object.MemberwiseClone
+  - System.Object.ReferenceEquals(System.Object,System.Object)
+  - System.Object.ToString
+  modifiers.csharp:
+  - public
+  - class
+  modifiers.vb:
+  - Public
+  - Class
+- uid: BackedFramework.BackedConfig.ApiPath
+  commentId: P:BackedFramework.BackedConfig.ApiPath
+  id: ApiPath
+  parent: BackedFramework.BackedConfig
+  langs:
+  - csharp
+  - vb
+  name: ApiPath
+  nameWithType: BackedConfig.ApiPath
+  fullName: BackedFramework.BackedConfig.ApiPath
+  type: Property
+  source:
+    remote:
+      path: BackedFramework/BackedConfig.cs
+      branch: master
+      repo: https://github.com/IAmTheTable/BackedFramework.git
+    id: ApiPath
+    path: ../BackedFramework/BackedConfig.cs
+    startLine: 11
+  assemblies:
+  - BackedFramework
+  namespace: BackedFramework
+  summary: "\nThe default path for routing API calls, must include the trailing slash.\n"
+  remarks: 'Example: &quot;/api&quot;'
+  example: []
+  syntax:
+    content: public string ApiPath { get; set; }
+    parameters: []
+    return:
+      type: System.String
+    content.vb: Public Property ApiPath As String
+  overload: BackedFramework.BackedConfig.ApiPath*
+  modifiers.csharp:
+  - public
+  - get
+  - set
+  modifiers.vb:
+  - Public
+- uid: BackedFramework.BackedConfig.RootDirectory
+  commentId: P:BackedFramework.BackedConfig.RootDirectory
+  id: RootDirectory
+  parent: BackedFramework.BackedConfig
+  langs:
+  - csharp
+  - vb
+  name: RootDirectory
+  nameWithType: BackedConfig.RootDirectory
+  fullName: BackedFramework.BackedConfig.RootDirectory
+  type: Property
+  source:
+    remote:
+      path: BackedFramework/BackedConfig.cs
+      branch: master
+      repo: https://github.com/IAmTheTable/BackedFramework.git
+    id: RootDirectory
+    path: ../BackedFramework/BackedConfig.cs
+    startLine: 16
+  assemblies:
+  - BackedFramework
+  namespace: BackedFramework
+  summary: "\nThe base directory to use when serving files.\n"
+  example: []
+  syntax:
+    content: public string RootDirectory { get; set; }
+    parameters: []
+    return:
+      type: System.String
+    content.vb: Public Property RootDirectory As String
+  overload: BackedFramework.BackedConfig.RootDirectory*
+  modifiers.csharp:
+  - public
+  - get
+  - set
+  modifiers.vb:
+  - Public
+- uid: BackedFramework.BackedConfig.ConnectionTimeout
+  commentId: P:BackedFramework.BackedConfig.ConnectionTimeout
+  id: ConnectionTimeout
+  parent: BackedFramework.BackedConfig
+  langs:
+  - csharp
+  - vb
+  name: ConnectionTimeout
+  nameWithType: BackedConfig.ConnectionTimeout
+  fullName: BackedFramework.BackedConfig.ConnectionTimeout
+  type: Property
+  source:
+    remote:
+      path: BackedFramework/BackedConfig.cs
+      branch: master
+      repo: https://github.com/IAmTheTable/BackedFramework.git
+    id: ConnectionTimeout
+    path: ../BackedFramework/BackedConfig.cs
+    startLine: 22
+  assemblies:
+  - BackedFramework
+  namespace: BackedFramework
+  summary: "\nThe timeout (in seconds) for clients to be connected to the server without sending a request.\n"
+  remarks: If a client doesnt send a request within the specified time, it will automatically disconnect the client from the server.
+  example: []
+  syntax:
+    content: public int ConnectionTimeout { get; set; }
+    parameters: []
+    return:
+      type: System.Int32
+    content.vb: Public Property ConnectionTimeout As Integer
+  overload: BackedFramework.BackedConfig.ConnectionTimeout*
+  modifiers.csharp:
+  - public
+  - get
+  - set
+  modifiers.vb:
+  - Public
+- uid: BackedFramework.BackedConfig.ApiVersion
+  commentId: P:BackedFramework.BackedConfig.ApiVersion
+  id: ApiVersion
+  parent: BackedFramework.BackedConfig
+  langs:
+  - csharp
+  - vb
+  name: ApiVersion
+  nameWithType: BackedConfig.ApiVersion
+  fullName: BackedFramework.BackedConfig.ApiVersion
+  type: Property
+  source:
+    remote:
+      path: BackedFramework/BackedConfig.cs
+      branch: master
+      repo: https://github.com/IAmTheTable/BackedFramework.git
+    id: ApiVersion
+    path: ../BackedFramework/BackedConfig.cs
+    startLine: 27
+  assemblies:
+  - BackedFramework
+  namespace: BackedFramework
+  summary: "\nThe default API version, doesnt have to be used, but still here for completeness.\n"
+  example: []
+  syntax:
+    content: public string ApiVersion { get; set; }
+    parameters: []
+    return:
+      type: System.String
+    content.vb: Public Property ApiVersion As String
+  overload: BackedFramework.BackedConfig.ApiVersion*
+  modifiers.csharp:
+  - public
+  - get
+  - set
+  modifiers.vb:
+  - Public
+- uid: BackedFramework.BackedConfig.ListeningPort
+  commentId: P:BackedFramework.BackedConfig.ListeningPort
+  id: ListeningPort
+  parent: BackedFramework.BackedConfig
+  langs:
+  - csharp
+  - vb
+  name: ListeningPort
+  nameWithType: BackedConfig.ListeningPort
+  fullName: BackedFramework.BackedConfig.ListeningPort
+  type: Property
+  source:
+    remote:
+      path: BackedFramework/BackedConfig.cs
+      branch: master
+      repo: https://github.com/IAmTheTable/BackedFramework.git
+    id: ListeningPort
+    path: ../BackedFramework/BackedConfig.cs
+    startLine: 31
+  assemblies:
+  - BackedFramework
+  namespace: BackedFramework
+  summary: "\nThe port for the server to listen for requests on.\n"
+  example: []
+  syntax:
+    content: public int ListeningPort { get; set; }
+    parameters: []
+    return:
+      type: System.Int32
+    content.vb: Public Property ListeningPort As Integer
+  overload: BackedFramework.BackedConfig.ListeningPort*
+  modifiers.csharp:
+  - public
+  - get
+  - set
+  modifiers.vb:
+  - Public
+- uid: BackedFramework.BackedConfig.UseSSL
+  commentId: P:BackedFramework.BackedConfig.UseSSL
+  id: UseSSL
+  parent: BackedFramework.BackedConfig
+  langs:
+  - csharp
+  - vb
+  name: UseSSL
+  nameWithType: BackedConfig.UseSSL
+  fullName: BackedFramework.BackedConfig.UseSSL
+  type: Property
+  source:
+    remote:
+      path: BackedFramework/BackedConfig.cs
+      branch: master
+      repo: https://github.com/IAmTheTable/BackedFramework.git
+    id: UseSSL
+    path: ../BackedFramework/BackedConfig.cs
+    startLine: 35
+  assemblies:
+  - BackedFramework
+  namespace: BackedFramework
+  summary: "\nEnable support for Secure-Socket-Layers...\n"
+  example: []
+  syntax:
+    content: public bool UseSSL { get; set; }
+    parameters: []
+    return:
+      type: System.Boolean
+    content.vb: Public Property UseSSL As Boolean
+  overload: BackedFramework.BackedConfig.UseSSL*
+  modifiers.csharp:
+  - public
+  - get
+  - set
+  modifiers.vb:
+  - Public
+- uid: BackedFramework.BackedConfig.SSLPath
+  commentId: P:BackedFramework.BackedConfig.SSLPath
+  id: SSLPath
+  parent: BackedFramework.BackedConfig
+  langs:
+  - csharp
+  - vb
+  name: SSLPath
+  nameWithType: BackedConfig.SSLPath
+  fullName: BackedFramework.BackedConfig.SSLPath
+  type: Property
+  source:
+    remote:
+      path: BackedFramework/BackedConfig.cs
+      branch: master
+      repo: https://github.com/IAmTheTable/BackedFramework.git
+    id: SSLPath
+    path: ../BackedFramework/BackedConfig.cs
+    startLine: 40
+  assemblies:
+  - BackedFramework
+  namespace: BackedFramework
+  summary: "\nThe path to search for SSL certificates.\n"
+  example: []
+  syntax:
+    content: public string SSLPath { get; set; }
+    parameters: []
+    return:
+      type: System.String
+    content.vb: Public Property SSLPath As String
+  overload: BackedFramework.BackedConfig.SSLPath*
+  modifiers.csharp:
+  - public
+  - get
+  - set
+  modifiers.vb:
+  - Public
+- uid: BackedFramework.BackedConfig.DynamicBuffers
+  commentId: P:BackedFramework.BackedConfig.DynamicBuffers
+  id: DynamicBuffers
+  parent: BackedFramework.BackedConfig
+  langs:
+  - csharp
+  - vb
+  name: DynamicBuffers
+  nameWithType: BackedConfig.DynamicBuffers
+  fullName: BackedFramework.BackedConfig.DynamicBuffers
+  type: Property
+  source:
+    remote:
+      path: BackedFramework/BackedConfig.cs
+      branch: master
+      repo: https://github.com/IAmTheTable/BackedFramework.git
+    id: DynamicBuffers
+    path: ../BackedFramework/BackedConfig.cs
+    startLine: 45
+  assemblies:
+  - BackedFramework
+  namespace: BackedFramework
+  summary: "\nDynamic buffers are buffers created by the server based on the amount of information its sending, cannot gaurauntee that the buffer wont be used for anything malicious but it can be used to increase performance.\n"
+  example: []
+  syntax:
+    content: public bool DynamicBuffers { get; set; }
+    parameters: []
+    return:
+      type: System.Boolean
+    content.vb: Public Property DynamicBuffers As Boolean
+  overload: BackedFramework.BackedConfig.DynamicBuffers*
+  modifiers.csharp:
+  - public
+  - get
+  - set
+  modifiers.vb:
+  - Public
+- uid: BackedFramework.BackedConfig.ReadBuffer
+  commentId: P:BackedFramework.BackedConfig.ReadBuffer
+  id: ReadBuffer
+  parent: BackedFramework.BackedConfig
+  langs:
+  - csharp
+  - vb
+  name: ReadBuffer
+  nameWithType: BackedConfig.ReadBuffer
+  fullName: BackedFramework.BackedConfig.ReadBuffer
+  type: Property
+  source:
+    remote:
+      path: BackedFramework/BackedConfig.cs
+      branch: master
+      repo: https://github.com/IAmTheTable/BackedFramework.git
+    id: ReadBuffer
+    path: ../BackedFramework/BackedConfig.cs
+    startLine: 50
+  assemblies:
+  - BackedFramework
+  namespace: BackedFramework
+  summary: "\nThe max amount of data (in bytes) that the server can recieve in a single request.\n"
+  remarks: '[!] Will not be used if dynamic buffers are enabled.'
+  example: []
+  syntax:
+    content: public int ReadBuffer { get; set; }
+    parameters: []
+    return:
+      type: System.Int32
+    content.vb: Public Property ReadBuffer As Integer
+  overload: BackedFramework.BackedConfig.ReadBuffer*
+  modifiers.csharp:
+  - public
+  - get
+  - set
+  modifiers.vb:
+  - Public
+- uid: BackedFramework.BackedConfig.WriteBuffer
+  commentId: P:BackedFramework.BackedConfig.WriteBuffer
+  id: WriteBuffer
+  parent: BackedFramework.BackedConfig
+  langs:
+  - csharp
+  - vb
+  name: WriteBuffer
+  nameWithType: BackedConfig.WriteBuffer
+  fullName: BackedFramework.BackedConfig.WriteBuffer
+  type: Property
+  source:
+    remote:
+      path: BackedFramework/BackedConfig.cs
+      branch: master
+      repo: https://github.com/IAmTheTable/BackedFramework.git
+    id: WriteBuffer
+    path: ../BackedFramework/BackedConfig.cs
+    startLine: 55
+  assemblies:
+  - BackedFramework
+  namespace: BackedFramework
+  summary: "\nThe max amount of data (in bytes)  that the server can send in a single request.\n"
+  remarks: '[!] Will not be used if dynamic buffers are enabled.'
+  example: []
+  syntax:
+    content: public int WriteBuffer { get; set; }
+    parameters: []
+    return:
+      type: System.Int32
+    content.vb: Public Property WriteBuffer As Integer
+  overload: BackedFramework.BackedConfig.WriteBuffer*
+  modifiers.csharp:
+  - public
+  - get
+  - set
+  modifiers.vb:
+  - Public
+- uid: BackedFramework.BackedConfig.UseMultiThreading
+  commentId: P:BackedFramework.BackedConfig.UseMultiThreading
+  id: UseMultiThreading
+  parent: BackedFramework.BackedConfig
+  langs:
+  - csharp
+  - vb
+  name: UseMultiThreading
+  nameWithType: BackedConfig.UseMultiThreading
+  fullName: BackedFramework.BackedConfig.UseMultiThreading
+  type: Property
+  source:
+    remote:
+      path: BackedFramework/BackedConfig.cs
+      branch: master
+      repo: https://github.com/IAmTheTable/BackedFramework.git
+    id: UseMultiThreading
+    path: ../BackedFramework/BackedConfig.cs
+    startLine: 60
+  assemblies:
+  - BackedFramework
+  namespace: BackedFramework
+  summary: "\nA request will be put into a new thread, including connections, will increase performance per request, but *WILL* increase cpu usage on high loads.\n"
+  example: []
+  syntax:
+    content: public bool UseMultiThreading { get; set; }
+    parameters: []
+    return:
+      type: System.Boolean
+    content.vb: Public Property UseMultiThreading As Boolean
+  overload: BackedFramework.BackedConfig.UseMultiThreading*
+  modifiers.csharp:
+  - public
+  - get
+  - set
+  modifiers.vb:
+  - Public
+- uid: BackedFramework.BackedConfig.MaxThreads
+  commentId: P:BackedFramework.BackedConfig.MaxThreads
+  id: MaxThreads
+  parent: BackedFramework.BackedConfig
+  langs:
+  - csharp
+  - vb
+  name: MaxThreads
+  nameWithType: BackedConfig.MaxThreads
+  fullName: BackedFramework.BackedConfig.MaxThreads
+  type: Property
+  source:
+    remote:
+      path: BackedFramework/BackedConfig.cs
+      branch: master
+      repo: https://github.com/IAmTheTable/BackedFramework.git
+    id: MaxThreads
+    path: ../BackedFramework/BackedConfig.cs
+    startLine: 65
+  assemblies:
+  - BackedFramework
+  namespace: BackedFramework
+  summary: "\nThe maximum amount of threads that the server will create, if the server reaches this threshold, newer connections will be slowed down significantly.\n"
+  remarks: If this value is 0, then it will remain unlimited
+  example: []
+  syntax:
+    content: public int MaxThreads { get; set; }
+    parameters: []
+    return:
+      type: System.Int32
+    content.vb: Public Property MaxThreads As Integer
+  overload: BackedFramework.BackedConfig.MaxThreads*
+  modifiers.csharp:
+  - public
+  - get
+  - set
+  modifiers.vb:
+  - Public
+- uid: BackedFramework.BackedConfig.ServerName
+  commentId: P:BackedFramework.BackedConfig.ServerName
+  id: ServerName
+  parent: BackedFramework.BackedConfig
+  langs:
+  - csharp
+  - vb
+  name: ServerName
+  nameWithType: BackedConfig.ServerName
+  fullName: BackedFramework.BackedConfig.ServerName
+  type: Property
+  source:
+    remote:
+      path: BackedFramework/BackedConfig.cs
+      branch: master
+      repo: https://github.com/IAmTheTable/BackedFramework.git
+    id: ServerName
+    path: ../BackedFramework/BackedConfig.cs
+    startLine: 71
+  assemblies:
+  - BackedFramework
+  namespace: BackedFramework
+  syntax:
+    content: public string ServerName { get; set; }
+    parameters: []
+    return:
+      type: System.String
+    content.vb: Public Property ServerName As String
+  overload: BackedFramework.BackedConfig.ServerName*
+  modifiers.csharp:
+  - public
+  - get
+  - set
+  modifiers.vb:
+  - Public
+- uid: BackedFramework.BackedConfig.#ctor
+  commentId: M:BackedFramework.BackedConfig.#ctor
+  id: '#ctor'
+  parent: BackedFramework.BackedConfig
+  langs:
+  - csharp
+  - vb
+  name: BackedConfig()
+  nameWithType: BackedConfig.BackedConfig()
+  fullName: BackedFramework.BackedConfig.BackedConfig()
+  type: Constructor
+  source:
+    remote:
+      path: BackedFramework/BackedConfig.cs
+      branch: master
+      repo: https://github.com/IAmTheTable/BackedFramework.git
+    id: .ctor
+    path: ../BackedFramework/BackedConfig.cs
+    startLine: 73
+  assemblies:
+  - BackedFramework
+  namespace: BackedFramework
+  syntax:
+    content: public BackedConfig()
+    content.vb: Public Sub New
+  overload: BackedFramework.BackedConfig.#ctor*
+  modifiers.csharp:
+  - public
+  modifiers.vb:
+  - Public
+- uid: BackedFramework.BackedConfig.#ctor(BackedFramework.BackedConfig)
+  commentId: M:BackedFramework.BackedConfig.#ctor(BackedFramework.BackedConfig)
+  id: '#ctor(BackedFramework.BackedConfig)'
+  parent: BackedFramework.BackedConfig
+  langs:
+  - csharp
+  - vb
+  name: BackedConfig(BackedConfig)
+  nameWithType: BackedConfig.BackedConfig(BackedConfig)
+  fullName: BackedFramework.BackedConfig.BackedConfig(BackedFramework.BackedConfig)
+  type: Constructor
+  source:
+    remote:
+      path: BackedFramework/BackedConfig.cs
+      branch: master
+      repo: https://github.com/IAmTheTable/BackedFramework.git
+    id: .ctor
+    path: ../BackedFramework/BackedConfig.cs
+    startLine: 79
+  assemblies:
+  - BackedFramework
+  namespace: BackedFramework
+  summary: "\nAn overload for the default constructor.\n"
+  example: []
+  syntax:
+    content: public BackedConfig(BackedConfig config)
+    parameters:
+    - id: config
+      type: BackedFramework.BackedConfig
+      description: Create a new config from a previous config
+    content.vb: Public Sub New(config As BackedConfig)
+  overload: BackedFramework.BackedConfig.#ctor*
+  modifiers.csharp:
+  - public
+  modifiers.vb:
+  - Public
+references:
+- uid: BackedFramework
+  commentId: N:BackedFramework
+  name: BackedFramework
+  nameWithType: BackedFramework
+  fullName: BackedFramework
+- uid: System.Object
+  commentId: T:System.Object
+  parent: System
+  isExternal: true
+  name: Object
+  nameWithType: Object
+  fullName: System.Object
+- uid: System.Object.Equals(System.Object)
+  commentId: M:System.Object.Equals(System.Object)
+  parent: System.Object
+  isExternal: true
+  name: Equals(Object)
+  nameWithType: Object.Equals(Object)
+  fullName: System.Object.Equals(System.Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    nameWithType: Object.Equals
+    fullName: System.Object.Equals
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    nameWithType: Object.Equals
+    fullName: System.Object.Equals
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System.Object.Equals(System.Object,System.Object)
+  commentId: M:System.Object.Equals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  name: Equals(Object, Object)
+  nameWithType: Object.Equals(Object, Object)
+  fullName: System.Object.Equals(System.Object, System.Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    nameWithType: Object.Equals
+    fullName: System.Object.Equals
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    nameWithType: Object.Equals
+    fullName: System.Object.Equals
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System.Object.GetHashCode
+  commentId: M:System.Object.GetHashCode
+  parent: System.Object
+  isExternal: true
+  name: GetHashCode()
+  nameWithType: Object.GetHashCode()
+  fullName: System.Object.GetHashCode()
+  spec.csharp:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    nameWithType: Object.GetHashCode
+    fullName: System.Object.GetHashCode
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    nameWithType: Object.GetHashCode
+    fullName: System.Object.GetHashCode
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System.Object.GetType
+  commentId: M:System.Object.GetType
+  parent: System.Object
+  isExternal: true
+  name: GetType()
+  nameWithType: Object.GetType()
+  fullName: System.Object.GetType()
+  spec.csharp:
+  - uid: System.Object.GetType
+    name: GetType
+    nameWithType: Object.GetType
+    fullName: System.Object.GetType
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.Object.GetType
+    name: GetType
+    nameWithType: Object.GetType
+    fullName: System.Object.GetType
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System.Object.MemberwiseClone
+  commentId: M:System.Object.MemberwiseClone
+  parent: System.Object
+  isExternal: true
+  name: MemberwiseClone()
+  nameWithType: Object.MemberwiseClone()
+  fullName: System.Object.MemberwiseClone()
+  spec.csharp:
+  - uid: System.Object.MemberwiseClone
+    name: MemberwiseClone
+    nameWithType: Object.MemberwiseClone
+    fullName: System.Object.MemberwiseClone
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.Object.MemberwiseClone
+    name: MemberwiseClone
+    nameWithType: Object.MemberwiseClone
+    fullName: System.Object.MemberwiseClone
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System.Object.ReferenceEquals(System.Object,System.Object)
+  commentId: M:System.Object.ReferenceEquals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  name: ReferenceEquals(Object, Object)
+  nameWithType: Object.ReferenceEquals(Object, Object)
+  fullName: System.Object.ReferenceEquals(System.Object, System.Object)
+  spec.csharp:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    nameWithType: Object.ReferenceEquals
+    fullName: System.Object.ReferenceEquals
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    nameWithType: Object.ReferenceEquals
+    fullName: System.Object.ReferenceEquals
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System.Object.ToString
+  commentId: M:System.Object.ToString
+  parent: System.Object
+  isExternal: true
+  name: ToString()
+  nameWithType: Object.ToString()
+  fullName: System.Object.ToString()
+  spec.csharp:
+  - uid: System.Object.ToString
+    name: ToString
+    nameWithType: Object.ToString
+    fullName: System.Object.ToString
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.Object.ToString
+    name: ToString
+    nameWithType: Object.ToString
+    fullName: System.Object.ToString
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System
+  commentId: N:System
+  isExternal: true
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: BackedFramework.BackedConfig.ApiPath*
+  commentId: Overload:BackedFramework.BackedConfig.ApiPath
+  name: ApiPath
+  nameWithType: BackedConfig.ApiPath
+  fullName: BackedFramework.BackedConfig.ApiPath
+- uid: System.String
+  commentId: T:System.String
+  parent: System
+  isExternal: true
+  name: String
+  nameWithType: String
+  fullName: System.String
+- uid: BackedFramework.BackedConfig.RootDirectory*
+  commentId: Overload:BackedFramework.BackedConfig.RootDirectory
+  name: RootDirectory
+  nameWithType: BackedConfig.RootDirectory
+  fullName: BackedFramework.BackedConfig.RootDirectory
+- uid: BackedFramework.BackedConfig.ConnectionTimeout*
+  commentId: Overload:BackedFramework.BackedConfig.ConnectionTimeout
+  name: ConnectionTimeout
+  nameWithType: BackedConfig.ConnectionTimeout
+  fullName: BackedFramework.BackedConfig.ConnectionTimeout
+- uid: System.Int32
+  commentId: T:System.Int32
+  parent: System
+  isExternal: true
+  name: Int32
+  nameWithType: Int32
+  fullName: System.Int32
+- uid: BackedFramework.BackedConfig.ApiVersion*
+  commentId: Overload:BackedFramework.BackedConfig.ApiVersion
+  name: ApiVersion
+  nameWithType: BackedConfig.ApiVersion
+  fullName: BackedFramework.BackedConfig.ApiVersion
+- uid: BackedFramework.BackedConfig.ListeningPort*
+  commentId: Overload:BackedFramework.BackedConfig.ListeningPort
+  name: ListeningPort
+  nameWithType: BackedConfig.ListeningPort
+  fullName: BackedFramework.BackedConfig.ListeningPort
+- uid: BackedFramework.BackedConfig.UseSSL*
+  commentId: Overload:BackedFramework.BackedConfig.UseSSL
+  name: UseSSL
+  nameWithType: BackedConfig.UseSSL
+  fullName: BackedFramework.BackedConfig.UseSSL
+- uid: System.Boolean
+  commentId: T:System.Boolean
+  parent: System
+  isExternal: true
+  name: Boolean
+  nameWithType: Boolean
+  fullName: System.Boolean
+- uid: BackedFramework.BackedConfig.SSLPath*
+  commentId: Overload:BackedFramework.BackedConfig.SSLPath
+  name: SSLPath
+  nameWithType: BackedConfig.SSLPath
+  fullName: BackedFramework.BackedConfig.SSLPath
+- uid: BackedFramework.BackedConfig.DynamicBuffers*
+  commentId: Overload:BackedFramework.BackedConfig.DynamicBuffers
+  name: DynamicBuffers
+  nameWithType: BackedConfig.DynamicBuffers
+  fullName: BackedFramework.BackedConfig.DynamicBuffers
+- uid: BackedFramework.BackedConfig.ReadBuffer*
+  commentId: Overload:BackedFramework.BackedConfig.ReadBuffer
+  name: ReadBuffer
+  nameWithType: BackedConfig.ReadBuffer
+  fullName: BackedFramework.BackedConfig.ReadBuffer
+- uid: BackedFramework.BackedConfig.WriteBuffer*
+  commentId: Overload:BackedFramework.BackedConfig.WriteBuffer
+  name: WriteBuffer
+  nameWithType: BackedConfig.WriteBuffer
+  fullName: BackedFramework.BackedConfig.WriteBuffer
+- uid: BackedFramework.BackedConfig.UseMultiThreading*
+  commentId: Overload:BackedFramework.BackedConfig.UseMultiThreading
+  name: UseMultiThreading
+  nameWithType: BackedConfig.UseMultiThreading
+  fullName: BackedFramework.BackedConfig.UseMultiThreading
+- uid: BackedFramework.BackedConfig.MaxThreads*
+  commentId: Overload:BackedFramework.BackedConfig.MaxThreads
+  name: MaxThreads
+  nameWithType: BackedConfig.MaxThreads
+  fullName: BackedFramework.BackedConfig.MaxThreads
+- uid: BackedFramework.BackedConfig.ServerName*
+  commentId: Overload:BackedFramework.BackedConfig.ServerName
+  name: ServerName
+  nameWithType: BackedConfig.ServerName
+  fullName: BackedFramework.BackedConfig.ServerName
+- uid: BackedFramework.BackedConfig.#ctor*
+  commentId: Overload:BackedFramework.BackedConfig.#ctor
+  name: BackedConfig
+  nameWithType: BackedConfig.BackedConfig
+  fullName: BackedFramework.BackedConfig.BackedConfig
+- uid: BackedFramework.BackedConfig
+  commentId: T:BackedFramework.BackedConfig
+  parent: BackedFramework
+  name: BackedConfig
+  nameWithType: BackedConfig
+  fullName: BackedFramework.BackedConfig

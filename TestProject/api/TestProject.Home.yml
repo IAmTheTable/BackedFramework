@@ -1,0 +1,568 @@
+### YamlMime:ManagedReference
+items:
+- uid: TestProject.Home
+  commentId: T:TestProject.Home
+  id: Home
+  parent: TestProject
+  children:
+  - TestProject.Home.admin(System.String)
+  - TestProject.Home.Index
+  - TestProject.Home.NotIndex
+  langs:
+  - csharp
+  - vb
+  name: Home
+  nameWithType: Home
+  fullName: TestProject.Home
+  type: Class
+  source:
+    remote:
+      path: TestProject/Program.cs
+      branch: master
+      repo: https://github.com/IAmTheTable/BackedFramework.git
+    id: Home
+    path: Program.cs
+    startLine: 73
+  assemblies:
+  - TestProject
+  namespace: TestProject
+  syntax:
+    content: >-
+      [Route("/test", HTTPMethods.GET)]
+
+      public class Home : BaseController, IDisposable
+    content.vb: >-
+      <Route("/test", HTTPMethods.GET)>
+
+      Public Class Home
+          Inherits BaseController
+          Implements IDisposable
+  inheritance:
+  - System.Object
+  - BackedFramework.Controllers.BaseController
+  implements:
+  - System.IDisposable
+  inheritedMembers:
+  - BackedFramework.Controllers.BaseController.Response
+  - BackedFramework.Controllers.BaseController.Request
+  - BackedFramework.Controllers.BaseController.Dispose
+  - System.Object.Equals(System.Object)
+  - System.Object.Equals(System.Object,System.Object)
+  - System.Object.GetHashCode
+  - System.Object.GetType
+  - System.Object.MemberwiseClone
+  - System.Object.ReferenceEquals(System.Object,System.Object)
+  - System.Object.ToString
+  attributes:
+  - type: BackedFramework.Api.Routing.RouteAttribute
+    ctor: BackedFramework.Api.Routing.RouteAttribute.#ctor(System.String,BackedFramework.Resources.HTTP.HTTPMethods)
+    arguments:
+    - type: System.String
+      value: /test
+    - type: BackedFramework.Resources.HTTP.HTTPMethods
+      value: 0
+  modifiers.csharp:
+  - public
+  - class
+  modifiers.vb:
+  - Public
+  - Class
+- uid: TestProject.Home.Index
+  commentId: M:TestProject.Home.Index
+  id: Index
+  parent: TestProject.Home
+  langs:
+  - csharp
+  - vb
+  name: Index()
+  nameWithType: Home.Index()
+  fullName: TestProject.Home.Index()
+  type: Method
+  source:
+    remote:
+      path: TestProject/Program.cs
+      branch: master
+      repo: https://github.com/IAmTheTable/BackedFramework.git
+    id: Index
+    path: Program.cs
+    startLine: 76
+  assemblies:
+  - TestProject
+  namespace: TestProject
+  syntax:
+    content: >-
+      [Route("/cool/index/", HTTPMethods.GET)]
+
+      public void Index()
+    content.vb: >-
+      <Route("/cool/index/", HTTPMethods.GET)>
+
+      Public Sub Index
+  overload: TestProject.Home.Index*
+  attributes:
+  - type: BackedFramework.Api.Routing.RouteAttribute
+    ctor: BackedFramework.Api.Routing.RouteAttribute.#ctor(System.String,BackedFramework.Resources.HTTP.HTTPMethods)
+    arguments:
+    - type: System.String
+      value: /cool/index/
+    - type: BackedFramework.Resources.HTTP.HTTPMethods
+      value: 0
+  modifiers.csharp:
+  - public
+  modifiers.vb:
+  - Public
+- uid: TestProject.Home.NotIndex
+  commentId: M:TestProject.Home.NotIndex
+  id: NotIndex
+  parent: TestProject.Home
+  langs:
+  - csharp
+  - vb
+  name: NotIndex()
+  nameWithType: Home.NotIndex()
+  fullName: TestProject.Home.NotIndex()
+  type: Method
+  source:
+    remote:
+      path: TestProject/Program.cs
+      branch: master
+      repo: https://github.com/IAmTheTable/BackedFramework.git
+    id: NotIndex
+    path: Program.cs
+    startLine: 82
+  assemblies:
+  - TestProject
+  namespace: TestProject
+  syntax:
+    content: public void NotIndex()
+    content.vb: Public Sub NotIndex
+  overload: TestProject.Home.NotIndex*
+  modifiers.csharp:
+  - public
+  modifiers.vb:
+  - Public
+- uid: TestProject.Home.admin(System.String)
+  commentId: M:TestProject.Home.admin(System.String)
+  id: admin(System.String)
+  parent: TestProject.Home
+  langs:
+  - csharp
+  - vb
+  name: admin(String)
+  nameWithType: Home.admin(String)
+  fullName: TestProject.Home.admin(System.String)
+  type: Method
+  source:
+    remote:
+      path: TestProject/Program.cs
+      branch: master
+      repo: https://github.com/IAmTheTable/BackedFramework.git
+    id: admin
+    path: Program.cs
+    startLine: 88
+  assemblies:
+  - TestProject
+  namespace: TestProject
+  syntax:
+    content: >-
+      [Route("/notadmin", HTTPMethods.POST)]
+
+      public void admin(string name)
+    parameters:
+    - id: name
+      type: System.String
+    content.vb: >-
+      <Route("/notadmin", HTTPMethods.POST)>
+
+      Public Sub admin(name As String)
+  overload: TestProject.Home.admin*
+  attributes:
+  - type: BackedFramework.Api.Routing.RouteAttribute
+    ctor: BackedFramework.Api.Routing.RouteAttribute.#ctor(System.String,BackedFramework.Resources.HTTP.HTTPMethods)
+    arguments:
+    - type: System.String
+      value: /notadmin
+    - type: BackedFramework.Resources.HTTP.HTTPMethods
+      value: 2
+  modifiers.csharp:
+  - public
+  modifiers.vb:
+  - Public
+references:
+- uid: TestProject
+  commentId: N:TestProject
+  name: TestProject
+  nameWithType: TestProject
+  fullName: TestProject
+- uid: System.Object
+  commentId: T:System.Object
+  parent: System
+  isExternal: true
+  name: Object
+  nameWithType: Object
+  fullName: System.Object
+- uid: BackedFramework.Controllers.BaseController
+  commentId: T:BackedFramework.Controllers.BaseController
+  parent: BackedFramework.Controllers
+  name: BaseController
+  nameWithType: BaseController
+  fullName: BackedFramework.Controllers.BaseController
+- uid: System.IDisposable
+  commentId: T:System.IDisposable
+  parent: System
+  isExternal: true
+  name: IDisposable
+  nameWithType: IDisposable
+  fullName: System.IDisposable
+- uid: BackedFramework.Controllers.BaseController.Response
+  commentId: P:BackedFramework.Controllers.BaseController.Response
+  parent: BackedFramework.Controllers.BaseController
+  name: Response
+  nameWithType: BaseController.Response
+  fullName: BackedFramework.Controllers.BaseController.Response
+- uid: BackedFramework.Controllers.BaseController.Request
+  commentId: P:BackedFramework.Controllers.BaseController.Request
+  parent: BackedFramework.Controllers.BaseController
+  name: Request
+  nameWithType: BaseController.Request
+  fullName: BackedFramework.Controllers.BaseController.Request
+- uid: BackedFramework.Controllers.BaseController.Dispose
+  commentId: M:BackedFramework.Controllers.BaseController.Dispose
+  parent: BackedFramework.Controllers.BaseController
+  name: Dispose()
+  nameWithType: BaseController.Dispose()
+  fullName: BackedFramework.Controllers.BaseController.Dispose()
+  spec.csharp:
+  - uid: BackedFramework.Controllers.BaseController.Dispose
+    name: Dispose
+    nameWithType: BaseController.Dispose
+    fullName: BackedFramework.Controllers.BaseController.Dispose
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: BackedFramework.Controllers.BaseController.Dispose
+    name: Dispose
+    nameWithType: BaseController.Dispose
+    fullName: BackedFramework.Controllers.BaseController.Dispose
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System.Object.Equals(System.Object)
+  commentId: M:System.Object.Equals(System.Object)
+  parent: System.Object
+  isExternal: true
+  name: Equals(Object)
+  nameWithType: Object.Equals(Object)
+  fullName: System.Object.Equals(System.Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    nameWithType: Object.Equals
+    fullName: System.Object.Equals
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    nameWithType: Object.Equals
+    fullName: System.Object.Equals
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System.Object.Equals(System.Object,System.Object)
+  commentId: M:System.Object.Equals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  name: Equals(Object, Object)
+  nameWithType: Object.Equals(Object, Object)
+  fullName: System.Object.Equals(System.Object, System.Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    nameWithType: Object.Equals
+    fullName: System.Object.Equals
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    nameWithType: Object.Equals
+    fullName: System.Object.Equals
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System.Object.GetHashCode
+  commentId: M:System.Object.GetHashCode
+  parent: System.Object
+  isExternal: true
+  name: GetHashCode()
+  nameWithType: Object.GetHashCode()
+  fullName: System.Object.GetHashCode()
+  spec.csharp:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    nameWithType: Object.GetHashCode
+    fullName: System.Object.GetHashCode
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    nameWithType: Object.GetHashCode
+    fullName: System.Object.GetHashCode
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System.Object.GetType
+  commentId: M:System.Object.GetType
+  parent: System.Object
+  isExternal: true
+  name: GetType()
+  nameWithType: Object.GetType()
+  fullName: System.Object.GetType()
+  spec.csharp:
+  - uid: System.Object.GetType
+    name: GetType
+    nameWithType: Object.GetType
+    fullName: System.Object.GetType
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.Object.GetType
+    name: GetType
+    nameWithType: Object.GetType
+    fullName: System.Object.GetType
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System.Object.MemberwiseClone
+  commentId: M:System.Object.MemberwiseClone
+  parent: System.Object
+  isExternal: true
+  name: MemberwiseClone()
+  nameWithType: Object.MemberwiseClone()
+  fullName: System.Object.MemberwiseClone()
+  spec.csharp:
+  - uid: System.Object.MemberwiseClone
+    name: MemberwiseClone
+    nameWithType: Object.MemberwiseClone
+    fullName: System.Object.MemberwiseClone
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.Object.MemberwiseClone
+    name: MemberwiseClone
+    nameWithType: Object.MemberwiseClone
+    fullName: System.Object.MemberwiseClone
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System.Object.ReferenceEquals(System.Object,System.Object)
+  commentId: M:System.Object.ReferenceEquals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  name: ReferenceEquals(Object, Object)
+  nameWithType: Object.ReferenceEquals(Object, Object)
+  fullName: System.Object.ReferenceEquals(System.Object, System.Object)
+  spec.csharp:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    nameWithType: Object.ReferenceEquals
+    fullName: System.Object.ReferenceEquals
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    nameWithType: Object.ReferenceEquals
+    fullName: System.Object.ReferenceEquals
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System.Object.ToString
+  commentId: M:System.Object.ToString
+  parent: System.Object
+  isExternal: true
+  name: ToString()
+  nameWithType: Object.ToString()
+  fullName: System.Object.ToString()
+  spec.csharp:
+  - uid: System.Object.ToString
+    name: ToString
+    nameWithType: Object.ToString
+    fullName: System.Object.ToString
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.Object.ToString
+    name: ToString
+    nameWithType: Object.ToString
+    fullName: System.Object.ToString
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System
+  commentId: N:System
+  isExternal: true
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: BackedFramework.Controllers
+  commentId: N:BackedFramework.Controllers
+  name: BackedFramework.Controllers
+  nameWithType: BackedFramework.Controllers
+  fullName: BackedFramework.Controllers
+- uid: TestProject.Home.Index*
+  commentId: Overload:TestProject.Home.Index
+  name: Index
+  nameWithType: Home.Index
+  fullName: TestProject.Home.Index
+- uid: TestProject.Home.NotIndex*
+  commentId: Overload:TestProject.Home.NotIndex
+  name: NotIndex
+  nameWithType: Home.NotIndex
+  fullName: TestProject.Home.NotIndex
+- uid: TestProject.Home.admin*
+  commentId: Overload:TestProject.Home.admin
+  name: admin
+  nameWithType: Home.admin
+  fullName: TestProject.Home.admin
+- uid: System.String
+  commentId: T:System.String
+  parent: System
+  isExternal: true
+  name: String
+  nameWithType: String
+  fullName: System.String

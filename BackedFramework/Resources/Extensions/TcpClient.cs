@@ -47,6 +47,31 @@ namespace BackedFramework.Resources.Extensions
             }
         }
 
+        public void ReadData(int amt, Action<byte[]> callback)
+        {
+            // allocate the buffer
+            byte[] buffer = new byte[amt];
+            // start reading from the stream
+            var result = base.GetStream().BeginRead(buffer, 0, amt, _callback, null);
+
+            // wait until completion
+            if (!result.IsCompleted)
+                result.AsyncWaitHandle.WaitOne();
+
+            // handle the callback
+            void _callback(IAsyncResult res)
+            {
+                // read amount of data then compare with the amount the client sent
+                var amountRecieved = base.GetStream().EndRead(res);
+                if (amountRecieved == buffer.Length)
+                {
+                    Logging.Logger.Log(Logging.Logger.LogLevel.Debug, "Successfully read all data from client.");
+                    LastRequest = DateTime.Now;
+                    callback.Invoke(buffer); // send data back to caller.
+                }
+            }
+        }
+
 
         /// <summary>
         /// Write data to the connected socket.

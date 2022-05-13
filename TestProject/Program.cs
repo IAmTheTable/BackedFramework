@@ -13,7 +13,7 @@ namespace TestProject
                 ApiPath = "/api",
                 ListeningPort = 80,
                 ApiVersion = "v4.20",
-                RootDirectory = @"C:\Users\asanc052\Desktop\Work\FamilyWebsite\School_HtmlFamilyProject",
+                RootDirectory = @"root",
                 UseMultiThreading = true,
                 MaxThreads = 1,
                 DynamicBuffers = true,
@@ -38,17 +38,19 @@ namespace TestProject
             base.Response.SendFile(true, "index.html");
         }
 
-        [Route("/post", BackedFramework.Resources.HTTP.HTTPMethods.POST)]
-        public void Post(string value)
+        [Route("/post", BackedFramework.Resources.HTTP.HTTPMethods.GET)]
+        public void Post()
         {
-            base.Response.AddHeader("title", "HAHAHAH SKID");
-
-            var data = File.ReadAllText(BackedServer.Instance.Config.RootDirectory + "/test.html");
-            data = data.Replace("||", value); // replace our placeholder with the value
-
-            base.Response.Write(data);
-
+            base.Response.Write($"<script>alert('{File.ReadAllText(BackedServer.Instance.Config.RootDirectory + "/dynamic.txt")}');</script>");
             base.Response.FinishRequest();
+        }
+
+        [Route("/post", BackedFramework.Resources.HTTP.HTTPMethods.POST)]
+        public void Post(string data)
+        {
+            
+            File.WriteAllText(BackedServer.Instance.Config.RootDirectory + "/dynamic.txt", data);
+            base.Response.Redirect("post");
         }
 
         [Route("/img", BackedFramework.Resources.HTTP.HTTPMethods.GET)]

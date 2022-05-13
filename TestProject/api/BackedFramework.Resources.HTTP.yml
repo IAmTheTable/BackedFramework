@@ -1,0 +1,49 @@
+### YamlMime:ManagedReference
+items:
+- uid: BackedFramework.Resources.HTTP
+  commentId: N:BackedFramework.Resources.HTTP
+  id: BackedFramework.Resources.HTTP
+  children:
+  - BackedFramework.Resources.HTTP.HTTPMethods
+  - BackedFramework.Resources.HTTP.RequestContext
+  - BackedFramework.Resources.HTTP.ResponseBase
+  - BackedFramework.Resources.HTTP.ResponseContext
+  langs:
+  - csharp
+  - vb
+  name: BackedFramework.Resources.HTTP
+  nameWithType: BackedFramework.Resources.HTTP
+  fullName: BackedFramework.Resources.HTTP
+  type: Namespace
+  assemblies:
+  - BackedFramework
+references:
+- uid: BackedFramework.Resources.HTTP.HTTPMethods
+  commentId: T:BackedFramework.Resources.HTTP.HTTPMethods
+  parent: BackedFramework.Resources.HTTP
+  name: HTTPMethods
+  nameWithType: HTTPMethods
+  fullName: BackedFramework.Resources.HTTP.HTTPMethods
+- uid: BackedFramework.Resources.HTTP.RequestContext
+  commentId: T:BackedFramework.Resources.HTTP.RequestContext
+  parent: BackedFramework.Resources.HTTP
+  name: RequestContext
+  nameWithType: RequestContext
+  fullName: BackedFramework.Resources.HTTP.RequestContext
+- uid: BackedFramework.Resources.HTTP.ResponseBase
+  commentId: T:BackedFramework.Resources.HTTP.ResponseBase
+  parent: BackedFramework.Resources.HTTP
+  name: ResponseBase
+  nameWithType: ResponseBase
+  fullName: BackedFramework.Resources.HTTP.ResponseBase
+- uid: BackedFramework.Resources.HTTP.ResponseContext
+  commentId: T:BackedFramework.Resources.HTTP.ResponseContext
+  parent: BackedFramework.Resources.HTTP
+  name: ResponseContext
+  nameWithType: ResponseContext
+  fullName: BackedFramework.Resources.HTTP.ResponseContext
+- uid: BackedFramework.Resources.HTTP
+  commentId: N:BackedFramework.Resources.HTTP
+  name: BackedFramework.Resources.HTTP
+  nameWithType: BackedFramework.Resources.HTTP
+  fullName: BackedFramework.Resources.HTTP

@@ -117,7 +117,7 @@ namespace BackedFramework.Server
 
             // will be automatically disposed upon leaving the current scope
             using var x = new RouteManager();
-            
+
             // start the server
             this._server.Start();
 
@@ -182,7 +182,7 @@ namespace BackedFramework.Server
         /// <summary>
         /// Called when a client is connected to the server.
         /// </summary>
-        /// <param name="client"></param>
+        /// <param name="client">The TCPClient instance that the server will use to send data.</param>
         private static void OnClientConnectTest(TcpClient client)
         {
             // handle fixed buffers
@@ -191,14 +191,54 @@ namespace BackedFramework.Server
                 client.ReceiveBufferSize = BackedServer.Instance.Config.WriteBuffer;
                 client.SendBufferSize = BackedServer.Instance.Config.ReadBuffer;
             }
-
-            while (client.Available == 0)
+            else
             {
-                System.Threading.Thread.Sleep(1);
+                client.ReceiveBufferSize = int.MaxValue;
+                client.SendBufferSize += int.MaxValue;
             }
 
-            client.ReadData((byte[] data) =>
+            var last = 0;
+
+            while (client.Available != 0 && client.Available != last)
             {
+                System.Threading.Thread.Sleep(1);
+                last = client.Available;
+            }
+            // notes:
+            // there are 4 sets of /r/n in the request, /r/n /r/n /r/n /r/n
+
+
+
+            client.ReadData(512, (byte[] data) =>
+            {
+
+
+                var index = data.ToList().IndexOf(0xD);
+
+                bool tobreak = false;
+                
+                while (true || !tobreak)
+                {
+                    // read until the 4 sets of /r/n are present.
+                    if (data[index] == 0xD && data[index + 1] == 0xA && 
+                        data[index + 2] == 0xD && data[index + 3] == 0xA &&
+                         data[index + 4] == 0xD && data[index + 5] == 0xA &&
+                          data[index + 6] == 0xD && data[index + 7] == 0xA)
+                    {
+                        break;
+                    }
+
+                    // make sure to break after 1024 indexes because an HTTP header should not be more than 1024 bytes
+                    if (index > 1024)
+                        tobreak = true;
+                    
+                    index = data.ToList().IndexOf(0xD, index + 1);
+                }
+
+                // store the header in the buffer so we know how much data is in the packet...
+                List<byte> buffer = new();
+                // todo: parse the header and retrive the body size on post requests especially for images and such that are over 100k bytes.
+
                 using HTTPParser parser = new(Encoding.UTF8.GetString(data));
                 ClientRequest.Invoke(client, parser);
             });

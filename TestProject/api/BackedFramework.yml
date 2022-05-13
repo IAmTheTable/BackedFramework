@@ -1,0 +1,28 @@
+### YamlMime:ManagedReference
+items:
+- uid: BackedFramework
+  commentId: N:BackedFramework
+  id: BackedFramework
+  children:
+  - BackedFramework.BackedConfig
+  langs:
+  - csharp
+  - vb
+  name: BackedFramework
+  nameWithType: BackedFramework
+  fullName: BackedFramework
+  type: Namespace
+  assemblies:
+  - BackedFramework
+references:
+- uid: BackedFramework.BackedConfig
+  commentId: T:BackedFramework.BackedConfig
+  parent: BackedFramework
+  name: BackedConfig
+  nameWithType: BackedConfig
+  fullName: BackedFramework.BackedConfig
+- uid: BackedFramework
+  commentId: N:BackedFramework
+  name: BackedFramework
+  nameWithType: BackedFramework
+  fullName: BackedFramework

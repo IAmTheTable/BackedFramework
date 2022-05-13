@@ -1,0 +1,667 @@
+### YamlMime:ManagedReference
+items:
+- uid: TestProject.Base
+  commentId: T:TestProject.Base
+  id: Base
+  parent: TestProject
+  children:
+  - TestProject.Base.Func
+  - TestProject.Base.ImageRequest
+  - TestProject.Base.Index(System.String)
+  - TestProject.Base.Post
+  - TestProject.Base.Post(System.String)
+  langs:
+  - csharp
+  - vb
+  name: Base
+  nameWithType: Base
+  fullName: TestProject.Base
+  type: Class
+  source:
+    remote:
+      path: TestProject/Program.cs
+      branch: master
+      repo: https://github.com/IAmTheTable/BackedFramework.git
+    id: Base
+    path: Program.cs
+    startLine: 30
+  assemblies:
+  - TestProject
+  namespace: TestProject
+  syntax:
+    content: 'public class Base : BaseController, IDisposable'
+    content.vb: >-
+      Public Class Base
+          Inherits BaseController
+          Implements IDisposable
+  inheritance:
+  - System.Object
+  - BackedFramework.Controllers.BaseController
+  implements:
+  - System.IDisposable
+  inheritedMembers:
+  - BackedFramework.Controllers.BaseController.Response
+  - BackedFramework.Controllers.BaseController.Request
+  - BackedFramework.Controllers.BaseController.Dispose
+  - System.Object.Equals(System.Object)
+  - System.Object.Equals(System.Object,System.Object)
+  - System.Object.GetHashCode
+  - System.Object.GetType
+  - System.Object.MemberwiseClone
+  - System.Object.ReferenceEquals(System.Object,System.Object)
+  - System.Object.ToString
+  modifiers.csharp:
+  - public
+  - class
+  modifiers.vb:
+  - Public
+  - Class
+- uid: TestProject.Base.Index(System.String)
+  commentId: M:TestProject.Base.Index(System.String)
+  id: Index(System.String)
+  parent: TestProject.Base
+  langs:
+  - csharp
+  - vb
+  name: Index(String)
+  nameWithType: Base.Index(String)
+  fullName: TestProject.Base.Index(System.String)
+  type: Method
+  source:
+    remote:
+      path: TestProject/Program.cs
+      branch: master
+      repo: https://github.com/IAmTheTable/BackedFramework.git
+    id: Index
+    path: Program.cs
+    startLine: 32
+  assemblies:
+  - TestProject
+  namespace: TestProject
+  syntax:
+    content: >-
+      [Route("/", HTTPMethods.GET)]
+
+      public void Index(string name = "World!")
+    parameters:
+    - id: name
+      type: System.String
+    content.vb: >-
+      <Route("/", HTTPMethods.GET)>
+
+      Public Sub Index(name As String = "World!")
+  overload: TestProject.Base.Index*
+  attributes:
+  - type: BackedFramework.Api.Routing.RouteAttribute
+    ctor: BackedFramework.Api.Routing.RouteAttribute.#ctor(System.String,BackedFramework.Resources.HTTP.HTTPMethods)
+    arguments:
+    - type: System.String
+      value: /
+    - type: BackedFramework.Resources.HTTP.HTTPMethods
+      value: 0
+  modifiers.csharp:
+  - public
+  modifiers.vb:
+  - Public
+- uid: TestProject.Base.Post
+  commentId: M:TestProject.Base.Post
+  id: Post
+  parent: TestProject.Base
+  langs:
+  - csharp
+  - vb
+  name: Post()
+  nameWithType: Base.Post()
+  fullName: TestProject.Base.Post()
+  type: Method
+  source:
+    remote:
+      path: TestProject/Program.cs
+      branch: master
+      repo: https://github.com/IAmTheTable/BackedFramework.git
+    id: Post
+    path: Program.cs
+    startLine: 40
+  assemblies:
+  - TestProject
+  namespace: TestProject
+  syntax:
+    content: >-
+      [Route("/post", HTTPMethods.GET)]
+
+      public void Post()
+    content.vb: >-
+      <Route("/post", HTTPMethods.GET)>
+
+      Public Sub Post
+  overload: TestProject.Base.Post*
+  attributes:
+  - type: BackedFramework.Api.Routing.RouteAttribute
+    ctor: BackedFramework.Api.Routing.RouteAttribute.#ctor(System.String,BackedFramework.Resources.HTTP.HTTPMethods)
+    arguments:
+    - type: System.String
+      value: /post
+    - type: BackedFramework.Resources.HTTP.HTTPMethods
+      value: 0
+  modifiers.csharp:
+  - public
+  modifiers.vb:
+  - Public
+- uid: TestProject.Base.Post(System.String)
+  commentId: M:TestProject.Base.Post(System.String)
+  id: Post(System.String)
+  parent: TestProject.Base
+  langs:
+  - csharp
+  - vb
+  name: Post(String)
+  nameWithType: Base.Post(String)
+  fullName: TestProject.Base.Post(System.String)
+  type: Method
+  source:
+    remote:
+      path: TestProject/Program.cs
+      branch: master
+      repo: https://github.com/IAmTheTable/BackedFramework.git
+    id: Post
+    path: Program.cs
+    startLine: 47
+  assemblies:
+  - TestProject
+  namespace: TestProject
+  syntax:
+    content: >-
+      [Route("/post", HTTPMethods.POST)]
+
+      public void Post(string data)
+    parameters:
+    - id: data
+      type: System.String
+    content.vb: >-
+      <Route("/post", HTTPMethods.POST)>
+
+      Public Sub Post(data As String)
+  overload: TestProject.Base.Post*
+  attributes:
+  - type: BackedFramework.Api.Routing.RouteAttribute
+    ctor: BackedFramework.Api.Routing.RouteAttribute.#ctor(System.String,BackedFramework.Resources.HTTP.HTTPMethods)
+    arguments:
+    - type: System.String
+      value: /post
+    - type: BackedFramework.Resources.HTTP.HTTPMethods
+      value: 2
+  modifiers.csharp:
+  - public
+  modifiers.vb:
+  - Public
+- uid: TestProject.Base.ImageRequest
+  commentId: M:TestProject.Base.ImageRequest
+  id: ImageRequest
+  parent: TestProject.Base
+  langs:
+  - csharp
+  - vb
+  name: ImageRequest()
+  nameWithType: Base.ImageRequest()
+  fullName: TestProject.Base.ImageRequest()
+  type: Method
+  source:
+    remote:
+      path: TestProject/Program.cs
+      branch: master
+      repo: https://github.com/IAmTheTable/BackedFramework.git
+    id: ImageRequest
+    path: Program.cs
+    startLine: 55
+  assemblies:
+  - TestProject
+  namespace: TestProject
+  syntax:
+    content: >-
+      [Route("/img", HTTPMethods.GET)]
+
+      public void ImageRequest()
+    content.vb: >-
+      <Route("/img", HTTPMethods.GET)>
+
+      Public Sub ImageRequest
+  overload: TestProject.Base.ImageRequest*
+  attributes:
+  - type: BackedFramework.Api.Routing.RouteAttribute
+    ctor: BackedFramework.Api.Routing.RouteAttribute.#ctor(System.String,BackedFramework.Resources.HTTP.HTTPMethods)
+    arguments:
+    - type: System.String
+      value: /img
+    - type: BackedFramework.Resources.HTTP.HTTPMethods
+      value: 0
+  modifiers.csharp:
+  - public
+  modifiers.vb:
+  - Public
+- uid: TestProject.Base.Func
+  commentId: M:TestProject.Base.Func
+  id: Func
+  parent: TestProject.Base
+  langs:
+  - csharp
+  - vb
+  name: Func()
+  nameWithType: Base.Func()
+  fullName: TestProject.Base.Func()
+  type: Method
+  source:
+    remote:
+      path: TestProject/Program.cs
+      branch: master
+      repo: https://github.com/IAmTheTable/BackedFramework.git
+    id: Func
+    path: Program.cs
+    startLine: 62
+  assemblies:
+  - TestProject
+  namespace: TestProject
+  syntax:
+    content: >-
+      [Route("/home", HTTPMethods.GET)]
+
+      public void Func()
+    content.vb: >-
+      <Route("/home", HTTPMethods.GET)>
+
+      Public Sub Func
+  overload: TestProject.Base.Func*
+  attributes:
+  - type: BackedFramework.Api.Routing.RouteAttribute
+    ctor: BackedFramework.Api.Routing.RouteAttribute.#ctor(System.String,BackedFramework.Resources.HTTP.HTTPMethods)
+    arguments:
+    - type: System.String
+      value: /home
+    - type: BackedFramework.Resources.HTTP.HTTPMethods
+      value: 0
+  modifiers.csharp:
+  - public
+  modifiers.vb:
+  - Public
+references:
+- uid: TestProject
+  commentId: N:TestProject
+  name: TestProject
+  nameWithType: TestProject
+  fullName: TestProject
+- uid: System.Object
+  commentId: T:System.Object
+  parent: System
+  isExternal: true
+  name: Object
+  nameWithType: Object
+  fullName: System.Object
+- uid: BackedFramework.Controllers.BaseController
+  commentId: T:BackedFramework.Controllers.BaseController
+  parent: BackedFramework.Controllers
+  name: BaseController
+  nameWithType: BaseController
+  fullName: BackedFramework.Controllers.BaseController
+- uid: System.IDisposable
+  commentId: T:System.IDisposable
+  parent: System
+  isExternal: true
+  name: IDisposable
+  nameWithType: IDisposable
+  fullName: System.IDisposable
+- uid: BackedFramework.Controllers.BaseController.Response
+  commentId: P:BackedFramework.Controllers.BaseController.Response
+  parent: BackedFramework.Controllers.BaseController
+  name: Response
+  nameWithType: BaseController.Response
+  fullName: BackedFramework.Controllers.BaseController.Response
+- uid: BackedFramework.Controllers.BaseController.Request
+  commentId: P:BackedFramework.Controllers.BaseController.Request
+  parent: BackedFramework.Controllers.BaseController
+  name: Request
+  nameWithType: BaseController.Request
+  fullName: BackedFramework.Controllers.BaseController.Request
+- uid: BackedFramework.Controllers.BaseController.Dispose
+  commentId: M:BackedFramework.Controllers.BaseController.Dispose
+  parent: BackedFramework.Controllers.BaseController
+  name: Dispose()
+  nameWithType: BaseController.Dispose()
+  fullName: BackedFramework.Controllers.BaseController.Dispose()
+  spec.csharp:
+  - uid: BackedFramework.Controllers.BaseController.Dispose
+    name: Dispose
+    nameWithType: BaseController.Dispose
+    fullName: BackedFramework.Controllers.BaseController.Dispose
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: BackedFramework.Controllers.BaseController.Dispose
+    name: Dispose
+    nameWithType: BaseController.Dispose
+    fullName: BackedFramework.Controllers.BaseController.Dispose
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System.Object.Equals(System.Object)
+  commentId: M:System.Object.Equals(System.Object)
+  parent: System.Object
+  isExternal: true
+  name: Equals(Object)
+  nameWithType: Object.Equals(Object)
+  fullName: System.Object.Equals(System.Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    nameWithType: Object.Equals
+    fullName: System.Object.Equals
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    nameWithType: Object.Equals
+    fullName: System.Object.Equals
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System.Object.Equals(System.Object,System.Object)
+  commentId: M:System.Object.Equals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  name: Equals(Object, Object)
+  nameWithType: Object.Equals(Object, Object)
+  fullName: System.Object.Equals(System.Object, System.Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    nameWithType: Object.Equals
+    fullName: System.Object.Equals
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    nameWithType: Object.Equals
+    fullName: System.Object.Equals
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System.Object.GetHashCode
+  commentId: M:System.Object.GetHashCode
+  parent: System.Object
+  isExternal: true
+  name: GetHashCode()
+  nameWithType: Object.GetHashCode()
+  fullName: System.Object.GetHashCode()
+  spec.csharp:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    nameWithType: Object.GetHashCode
+    fullName: System.Object.GetHashCode
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    nameWithType: Object.GetHashCode
+    fullName: System.Object.GetHashCode
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System.Object.GetType
+  commentId: M:System.Object.GetType
+  parent: System.Object
+  isExternal: true
+  name: GetType()
+  nameWithType: Object.GetType()
+  fullName: System.Object.GetType()
+  spec.csharp:
+  - uid: System.Object.GetType
+    name: GetType
+    nameWithType: Object.GetType
+    fullName: System.Object.GetType
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.Object.GetType
+    name: GetType
+    nameWithType: Object.GetType
+    fullName: System.Object.GetType
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System.Object.MemberwiseClone
+  commentId: M:System.Object.MemberwiseClone
+  parent: System.Object
+  isExternal: true
+  name: MemberwiseClone()
+  nameWithType: Object.MemberwiseClone()
+  fullName: System.Object.MemberwiseClone()
+  spec.csharp:
+  - uid: System.Object.MemberwiseClone
+    name: MemberwiseClone
+    nameWithType: Object.MemberwiseClone
+    fullName: System.Object.MemberwiseClone
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.Object.MemberwiseClone
+    name: MemberwiseClone
+    nameWithType: Object.MemberwiseClone
+    fullName: System.Object.MemberwiseClone
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System.Object.ReferenceEquals(System.Object,System.Object)
+  commentId: M:System.Object.ReferenceEquals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  name: ReferenceEquals(Object, Object)
+  nameWithType: Object.ReferenceEquals(Object, Object)
+  fullName: System.Object.ReferenceEquals(System.Object, System.Object)
+  spec.csharp:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    nameWithType: Object.ReferenceEquals
+    fullName: System.Object.ReferenceEquals
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    nameWithType: Object.ReferenceEquals
+    fullName: System.Object.ReferenceEquals
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: ', '
+    nameWithType: ', '
+    fullName: ', '
+  - uid: System.Object
+    name: Object
+    nameWithType: Object
+    fullName: System.Object
+    isExternal: true
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System.Object.ToString
+  commentId: M:System.Object.ToString
+  parent: System.Object
+  isExternal: true
+  name: ToString()
+  nameWithType: Object.ToString()
+  fullName: System.Object.ToString()
+  spec.csharp:
+  - uid: System.Object.ToString
+    name: ToString
+    nameWithType: Object.ToString
+    fullName: System.Object.ToString
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+  spec.vb:
+  - uid: System.Object.ToString
+    name: ToString
+    nameWithType: Object.ToString
+    fullName: System.Object.ToString
+    isExternal: true
+  - name: (
+    nameWithType: (
+    fullName: (
+  - name: )
+    nameWithType: )
+    fullName: )
+- uid: System
+  commentId: N:System
+  isExternal: true
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: BackedFramework.Controllers
+  commentId: N:BackedFramework.Controllers
+  name: BackedFramework.Controllers
+  nameWithType: BackedFramework.Controllers
+  fullName: BackedFramework.Controllers
+- uid: TestProject.Base.Index*
+  commentId: Overload:TestProject.Base.Index
+  name: Index
+  nameWithType: Base.Index
+  fullName: TestProject.Base.Index
+- uid: System.String
+  commentId: T:System.String
+  parent: System
+  isExternal: true
+  name: String
+  nameWithType: String
+  fullName: System.String
+- uid: TestProject.Base.Post*
+  commentId: Overload:TestProject.Base.Post
+  name: Post
+  nameWithType: Base.Post
+  fullName: TestProject.Base.Post
+- uid: TestProject.Base.ImageRequest*
+  commentId: Overload:TestProject.Base.ImageRequest
+  name: ImageRequest
+  nameWithType: Base.ImageRequest
+  fullName: TestProject.Base.ImageRequest
+- uid: TestProject.Base.Func*
+  commentId: Overload:TestProject.Base.Func
+  name: Func
+  nameWithType: Base.Func
+  fullName: TestProject.Base.Func
