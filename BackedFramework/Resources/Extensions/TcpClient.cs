@@ -47,12 +47,12 @@ namespace BackedFramework.Resources.Extensions
             }
         }
 
-        public void ReadData(int amt, Action<byte[]> callback)
+        public void ReadData(long amt, Action<byte[]> callback)
         {
             // allocate the buffer
             byte[] buffer = new byte[amt];
             // start reading from the stream
-            var result = base.GetStream().BeginRead(buffer, 0, amt, _callback, null);
+            var result = base.GetStream().BeginRead(buffer, 0, (int)amt, _callback, null);
 
             // wait until completion
             if (!result.IsCompleted)

@@ -193,55 +193,88 @@ namespace BackedFramework.Server
             }
             else
             {
+                // set the max buffers if the config doesnt define them
                 client.ReceiveBufferSize = int.MaxValue;
-                client.SendBufferSize += int.MaxValue;
+                client.SendBufferSize = int.MaxValue;
             }
 
+            // last buffer size.
             var last = 0;
 
+            // kind of pointless, but still good to have
             while (client.Available != 0 && client.Available != last)
             {
                 System.Threading.Thread.Sleep(1);
                 last = client.Available;
             }
+
             // notes:
             // there are 4 sets of /r/n in the request, /r/n /r/n /r/n /r/n
-
-
-
-            client.ReadData(512, (byte[] data) =>
+            client.ReadData(1024, (byte[] data) =>
             {
-
-
+                // the index of the first set of /r/n,
                 var index = data.ToList().IndexOf(0xD);
 
                 bool tobreak = false;
-                
+
+                // read until we hit our series of /r/n/r/n/r/n/r/n
+                // or until we read 1024 bytes, because a header should not be longer than 1024 bytes
                 while (true || !tobreak)
                 {
                     // read until the 4 sets of /r/n are present.
-                    if (data[index] == 0xD && data[index + 1] == 0xA && 
-                        data[index + 2] == 0xD && data[index + 3] == 0xA &&
-                         data[index + 4] == 0xD && data[index + 5] == 0xA &&
-                          data[index + 6] == 0xD && data[index + 7] == 0xA)
-                    {
+                    // should be exactly as follows: "/r/n/r/n/r/n/r/n"
+                    if (data[index] == 0xD && data[index + 1] == 0xA && // first set
+                        data[index + 2] == 0xD && data[index + 3] == 0xA && // second set
+                         data[index + 4] == 0xD && data[index + 5] == 0xA && // third set
+                          data[index + 6] == 0xD && data[index + 7] == 0xA) // fourth set
                         break;
-                    }
 
                     // make sure to break after 1024 indexes because an HTTP header should not be more than 1024 bytes
                     if (index > 1024)
                         tobreak = true;
-                    
+
+                    // set our index with the next set of /r
                     index = data.ToList().IndexOf(0xD, index + 1);
                 }
 
                 // store the header in the buffer so we know how much data is in the packet...
-                List<byte> buffer = new();
+                List<byte> buffer = data.Take(index).ToList();
                 // todo: parse the header and retrive the body size on post requests especially for images and such that are over 100k bytes.
 
-                using HTTPParser parser = new(Encoding.UTF8.GetString(data));
-                ClientRequest.Invoke(client, parser);
+                // partially parse the header...
+                using HTTPParser parser = new(Encoding.UTF8.GetString(buffer.ToArray()));
+
+                // get the content length header and find out how much data we need to read.
+                if (parser.Headers.ContainsKey("Content-Length"))
+                {
+                    // store that data
+                    var len = parser.Headers["Content-Length"];
+
+                    // since we "read 1024 bytes, we need to subtract the index
+                    // because the index is the ending index of data we read.
+                    // then we add 4 because we skip the /r/n/r/n
+                    // so now there is only /r/n/r/n then the packet data
+                    // after that, we subtract this value from the content-length
+                    // and that is the remaining bytes to read.
+                    var remainingDataToRead = Convert.ToInt64(len) - (1024 - (index + 4));
+
+                    // read all the remaining data...
+                    client.ReadData(remainingDataToRead, (byte[] c_buff) =>
+                    {
+                        // a temporary holder for our data.
+                        List<byte> temp = new();
+                        // add the remaining bytes of the previous packet we recieved and add it to our list.
+                        temp.AddRange(data.TakeLast(data.Length - index - 4));
+                        temp.AddRange(c_buff);// concat the remaining data from the current packet to the previous packet.
+
+                        // set the post data.
+                        parser.PostData = temp.ToArray();
+                        // finally invoke the request.
+                        ClientRequest.Invoke(client, parser);
+                    });
+                }
             });
+
         }
     }
 }

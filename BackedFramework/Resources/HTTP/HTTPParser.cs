@@ -141,11 +141,14 @@ namespace BackedFramework.Resources.HTTP
                 this.Body += (x == "" ? "" : x + '\n');
             });
 
-            this.Body = this.Body.Substring(0, this.Body.Length - 1);
-            int lineCount = this.Body.Split('\n').Length - 1;
-            if ((this.Body.Count() + lineCount).ToString() != this.Headers["Content-Length"])
+            if (this.Body != "")
             {
-                Logger.Log(Logger.LogLevel.Info, "Body length does not match header length.");
+                this.Body = this.Body.Substring(0, this.Body.Length - 1);
+                int lineCount = this.Body.Split('\n').Length - 1;
+                if ((this.Body.Count() + lineCount).ToString() != this.Headers["Content-Length"])
+                {
+                    Logger.Log(Logger.LogLevel.Info, "Body length does not match header length.");
+                }
             }
         }
 
@@ -456,6 +459,12 @@ namespace BackedFramework.Resources.HTTP
         /// Actual body of the request, like the HTML page content
         /// </summary>
         public string Content { get; internal set; } = "";
+
+        /// <summary>
+        /// Data body of the post request in bytes, will not always be set...
+        /// </summary>
+        public byte[] PostData { get; internal set; }
+
         /// <summary>
         /// Converts all the request data to a string that is valid for an HTTP request
         /// </summary>

@@ -29,6 +29,17 @@ namespace BackedFramework.Resources.HTTP
         }
 
         /// <summary>
+        /// Bytes of the post body, will not always be set...
+        /// </summary>
+        public byte[] PostData
+        {
+            get
+            {
+                return this._parser.PostData;
+            }
+        }
+
+        /// <summary>
         /// The query parameters in the request.
         /// </summary>
         public Dictionary<string, string> QueryParameters

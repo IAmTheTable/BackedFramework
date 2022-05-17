@@ -49,7 +49,7 @@ namespace TestProject
         public void Post(string data)
         {
             
-            File.WriteAllText(BackedServer.Instance.Config.RootDirectory + "/dynamic.txt", data);
+            File.WriteAllBytes(BackedServer.Instance.Config.RootDirectory + "/image.png", base.Request.);
             base.Response.Redirect("post");
         }
 
