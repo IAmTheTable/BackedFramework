@@ -30,7 +30,7 @@ namespace BackedFramework.Resources.HTTP
 
             _cancellationToken.Register(() =>
             {
-                Logger.Log(Logger.LogLevel.Warning, "Cancellation token has been triggered, closing connection");
+                Logger.LogInt(Logger.LogLevel.Warning, "Cancellation token has been triggered, closing connection");
                 this.Dispose();
             });
         }
@@ -161,7 +161,7 @@ namespace BackedFramework.Resources.HTTP
             }
             catch (IOException)
             {
-                Logger.Log(Logger.LogLevel.Error, "Failed to finish writing to the client.");
+                Logger.LogInt(Logger.LogLevel.Error, "Failed to finish writing to the client.");
             }
         }
 
@@ -233,8 +233,8 @@ namespace BackedFramework.Resources.HTTP
             if (OnRequestFinished is not null)
                 OnRequestFinished.Invoke();
             
-            Logger.Log(Logger.LogLevel.Info, $"The server sent a connection: {base.Headers["Connection"]} value.");
-            Logger.Log(Logger.LogLevel.Debug, $"Request completed at {this._requestContext.Path}, there are currently: {_instanceCount} requests in progress and there are {_instanceCount - 1} zombie requests.");
+            Logger.LogInt(Logger.LogLevel.Info, $"The server sent a connection: {base.Headers["Connection"]} value.");
+            Logger.LogInt(Logger.LogLevel.Debug, $"Request completed at {this._requestContext.Path}, there are currently: {_instanceCount} requests in progress and there are {_instanceCount - 1} zombie requests.");
 
             //ConnectionManager._instance.RemoveConnection(_requestContext.RequestHeaders["Host"]);
 

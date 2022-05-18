@@ -272,7 +272,7 @@ namespace BackedFramework.Api.Routing
                 catch
                 {
                     // maybe log this?
-                    Logger.Log(Logger.LogLevel.Fatal, "Failed to execute route, this is a fatal error, please check any requests for malicious data.");
+                    Logger.LogInt(Logger.LogLevel.Fatal, "Failed to execute route, this is a fatal error, please check any requests for malicious data.");
                     return false;
                 }
 

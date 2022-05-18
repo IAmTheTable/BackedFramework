@@ -47,9 +47,14 @@ namespace BackedFramework.Resources.Logging
             /// </summary>
             Fatal
         }
-        public static void Log(LogLevel level, params string[] args)
+        /// <summary>
+        /// Logs a message to the event log.
+        /// </summary>
+        /// <param name="level">The severity of the log.</param>
+        /// <param name="args">The content of the log itself.</param>
+        internal static void LogInt(LogLevel level, params string[] args)
         {
-            Console.WriteLine($"[{Enum.GetName(level)}] [{DateTime.Now:G}] {string.Join(" ", args)}");
+            OnLog.Invoke(level, string.Join(" ", args));
 
             // if the log level already exists, add the new args to the existing list
             if (_logs.ContainsKey(level))
@@ -60,6 +65,15 @@ namespace BackedFramework.Resources.Logging
             {
                 _logs.Add(level, new[] { $"[{Enum.GetName(level)}] [{DateTime.Now:G}] {string.Join(" ", args)}" });
             }
+        }
+        /// <summary>
+        /// Logs a message to the console.
+        /// </summary>
+        /// <param name="level">The severity of the log.</param>
+        /// <param name="args">The content of the log itself.</param>
+        public static void Log(LogLevel level, params string[] args)
+        {
+            Console.WriteLine($"[{Enum.GetName(level)}] [{DateTime.Now:G}] {string.Join(" ", args)}");
         }
 
         /// <summary>
