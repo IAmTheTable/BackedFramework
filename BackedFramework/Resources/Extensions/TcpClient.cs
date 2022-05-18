@@ -43,7 +43,7 @@ namespace BackedFramework.Resources.Extensions
                 var amountRecieved = base.GetStream().EndRead(res);
                 if (amountRecieved == buffer.Length)
                 {
-                    Logging.Logger.Log(Logging.Logger.LogLevel.Debug, "Successfully read all data from client.");
+                    Logging.Logger.LogInt(Logging.Logger.LogLevel.Debug, "Successfully read all data from client.");
                     LastRequest = DateTime.Now;
                     callback.Invoke(buffer); // send data back to caller.
                 }
@@ -78,29 +78,29 @@ namespace BackedFramework.Resources.Extensions
                 var amountRecieved = base.GetStream().EndRead(res);
                 if (amountRecieved == buffer.Length)
                 {
-                    Logging.Logger.Log(Logging.Logger.LogLevel.Debug, "Successfully read all data from client.");
+                    Logging.Logger.LogInt(Logging.Logger.LogLevel.Debug, "Successfully read all data from client.");
                     LastRequest = DateTime.Now;
                     callback.Invoke(buffer); // send data back to caller.
                 }
                 else if (amountRecieved < buffer.Length)
                 {
-                    Logging.Logger.Log(Logging.Logger.LogLevel.Warning, "Recieved less data than requested...");
+                    Logging.Logger.LogInt(Logging.Logger.LogLevel.Warning, "Recieved less data than requested...");
                     LastRequest = DateTime.Now;
 
                     ReadData(amt - amountRecieved, (byte[] buff) =>
                     {
                         buff.CopyTo(buffer, amountRecieved);
-                        Logging.Logger.Log(Logging.Logger.LogLevel.Debug, "Read the remaining data?");
+                        Logging.Logger.LogInt(Logging.Logger.LogLevel.Debug, "Read the remaining data?");
                         if (Client.Available == 0)
                         {
-                            Logging.Logger.Log(Logging.Logger.LogLevel.Debug, "Confirmed all data!");
+                            Logging.Logger.LogInt(Logging.Logger.LogLevel.Debug, "Confirmed all data!");
                             callback.Invoke(buffer);
                         }
                     });
                 }
                 else if (amountRecieved > buffer.Length)
                 {
-                    Logging.Logger.Log(Logging.Logger.LogLevel.Debug, "Got more data than requested?");
+                    Logging.Logger.LogInt(Logging.Logger.LogLevel.Debug, "Got more data than requested?");
                     LastRequest = DateTime.Now;
                 }
             }
@@ -135,7 +135,7 @@ namespace BackedFramework.Resources.Extensions
                 }
                 catch
                 {
-                    Logging.Logger.Log(Logging.Logger.LogLevel.Warning, "Failed to write data to the stream.");
+                    Logging.Logger.LogInt(Logging.Logger.LogLevel.Warning, "Failed to write data to the stream.");
                 }
             }, cancellationToken);
 
@@ -147,7 +147,7 @@ namespace BackedFramework.Resources.Extensions
             var task = Task.Run(() =>
             {
                 LastRequest = DateTime.Now;
-                Logging.Logger.Log(Logging.Logger.LogLevel.Debug, "Finished writing data to the stream.");
+                Logging.Logger.LogInt(Logging.Logger.LogLevel.Debug, "Finished writing data to the stream.");
                 try
                 {
                     base.GetStream().EndWrite(result);
@@ -163,7 +163,7 @@ namespace BackedFramework.Resources.Extensions
 
         public new void Dispose()
         {
-            Logging.Logger.Log(Logging.Logger.LogLevel.Info, "Disposing TcpClient.");
+            Logging.Logger.LogInt(Logging.Logger.LogLevel.Info, "Disposing TcpClient.");
 
             Task.WaitAll(_currentOperations.ToArray());
 
@@ -174,7 +174,7 @@ namespace BackedFramework.Resources.Extensions
             }
 
             base.Dispose();
-            Logging.Logger.Log(Logging.Logger.LogLevel.Info, "Finished Disposition.");
+            Logging.Logger.LogInt(Logging.Logger.LogLevel.Info, "Finished Disposition.");
         }
     }
 }

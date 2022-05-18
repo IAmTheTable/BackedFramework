@@ -58,7 +58,7 @@ namespace BackedFramework.Resources.HTTP
         /// </summary>
         public void Dispose()
         {
-            Logger.Log(Logger.LogLevel.Debug, "Disposing Response Base");
+            Logger.LogInt(Logger.LogLevel.Debug, "Disposing Response Base");
             GC.Collect();
             GC.SuppressFinalize(this);
         }

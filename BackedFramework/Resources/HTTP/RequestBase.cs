@@ -77,7 +77,7 @@ namespace BackedFramework.Resources.HTTP
 
         public void Dispose()
         {
-            Logger.Log(Logger.LogLevel.Debug, "Disposing Request Base");
+            Logger.LogInt(Logger.LogLevel.Debug, "Disposing Request Base");
 
             GC.Collect();
             GC.SuppressFinalize(this);            

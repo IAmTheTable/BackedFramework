@@ -98,7 +98,7 @@ namespace BackedFramework.Resources.HTTP
         /// </summary>
         public void Dispose()
         {
-            Logger.Log(Logger.LogLevel.Debug, "Disposing Request Context");
+            Logger.LogInt(Logger.LogLevel.Debug, "Disposing Request Context");
 
             GC.Collect();
             GC.SuppressFinalize(this);

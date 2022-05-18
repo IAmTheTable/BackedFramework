@@ -35,7 +35,7 @@ namespace BackedFramework.Resources.HTTP
         {
             if (string.IsNullOrWhiteSpace(Input))
             {
-                Logger.Log(Logger.LogLevel.Error, "Failed parse HTTP packet, input is null or empty.");
+                Logger.LogInt(Logger.LogLevel.Error, "Failed parse HTTP packet, input is null or empty.");
                 return;
             }
 
@@ -93,13 +93,13 @@ namespace BackedFramework.Resources.HTTP
             {
                 if (!RequireHeader(headers, "Content-Length"))
                 {
-                    Logger.Log(Logger.LogLevel.Error, "Failed parse HTTP packet, missing Content-Length header.");
+                    Logger.LogInt(Logger.LogLevel.Error, "Failed parse HTTP packet, missing Content-Length header.");
                     return;
                 }
 
                 if (!RequireHeader(headers, "Content-Type"))
                 {
-                    Logger.Log(Logger.LogLevel.Error, "Failed parse HTTP packet, missing Content-Type header.");
+                    Logger.LogInt(Logger.LogLevel.Error, "Failed parse HTTP packet, missing Content-Type header.");
                     return;
                 }
 
@@ -148,7 +148,7 @@ namespace BackedFramework.Resources.HTTP
                 int lineCount = this.Body.Split('\n').Length - 1;
                 if ((this.Body.Length + lineCount).ToString() != this.Headers["Content-Length"])
                 {
-                    Logger.Log(Logger.LogLevel.Info, "Body length does not match header length.");
+                    Logger.LogInt(Logger.LogLevel.Info, "Body length does not match header length.");
                 }
             }
         }
@@ -210,7 +210,7 @@ namespace BackedFramework.Resources.HTTP
                 else if ((x == this.Boundary || x == this.Boundary + "--") && data) // boundary and (not end and data) - was able to read data
                 {
                     data = !data;
-                    Logger.Log(Logger.LogLevel.Debug, sectionData);
+                    Logger.LogInt(Logger.LogLevel.Debug, sectionData);
 
                     // literal result 
 
@@ -367,7 +367,7 @@ namespace BackedFramework.Resources.HTTP
             this.Url = null;
             this.Code = null;
 
-            Logger.Log(Logger.LogLevel.Debug, "Disposing HTTP Parser");
+            Logger.LogInt(Logger.LogLevel.Debug, "Disposing HTTP Parser");
 
             GC.Collect();
             GC.SuppressFinalize(this);

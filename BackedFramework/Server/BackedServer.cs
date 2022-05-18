@@ -82,7 +82,7 @@ namespace BackedFramework.Server
                     Directory.CreateDirectory("backed-logs");
 
                 File.WriteAllLines($"backed-logs/{DateTime.Now.ToString("MM-dd-yyyy-HH-mm-ss").Replace(" ", "-").Replace("\\", "-")}.log", Logger.DumpLogs());
-                Logger.Log(Logger.LogLevel.Debug, "Dumped all logs");
+                Logger.LogInt(Logger.LogLevel.Debug, "Dumped all logs");
             }
         }
 
@@ -92,7 +92,7 @@ namespace BackedFramework.Server
                 Directory.CreateDirectory("backed-logs");
 
             File.WriteAllLines($"backed-logs/{DateTime.Now.ToString("MM-dd-yyyy-HH-mm-ss").Replace(" ", "-").Replace("\\", "-")}.log", Logger.DumpLogs());
-            Logger.Log(Logger.LogLevel.Debug, "Dumped all logs");
+            Logger.LogInt(Logger.LogLevel.Debug, "Dumped all logs");
         }
 
         private void CurrentDomain_ProcessExit(object sender, EventArgs e)
@@ -101,7 +101,7 @@ namespace BackedFramework.Server
                 Directory.CreateDirectory("backed-logs");
 
             File.WriteAllLines($"backed-logs/{DateTime.Now.ToString("MM-dd-yyyy-HH-mm-ss").Replace(" ", "-").Replace("\\", "-")}.log", Logger.DumpLogs());
-            Logger.Log(Logger.LogLevel.Debug, "Dumped all logs");
+            Logger.LogInt(Logger.LogLevel.Debug, "Dumped all logs");
         }
 
         /// <summary>
@@ -145,7 +145,7 @@ namespace BackedFramework.Server
                 }
                 catch (Exception e)
                 {
-                    Logger.Log(Logger.LogLevel.Error, e.Message);
+                    Logger.LogInt(Logger.LogLevel.Error, e.Message);
                 }
             }).Start();
         }
@@ -171,7 +171,7 @@ namespace BackedFramework.Server
             // run the request through the route manager
             if (!RouteManager.s_instance.TryExecuteRoute(parser, rspCtx, reqCtx))
             {
-                Logger.Log(Logger.LogLevel.Warning, "Failed to execute route...");
+                Logger.LogInt(Logger.LogLevel.Warning, "Failed to execute route...");
 #if DEBUG
                 throw new Exception("failed to execute route...");
 #else
@@ -220,14 +220,14 @@ namespace BackedFramework.Server
             {
                 if (data.Length == 0)
                 {
-                    Logger.Log(Logger.LogLevel.Warning, "Attempted to read data but there is no data to read...");
+                    Logger.LogInt(Logger.LogLevel.Warning, "Attempted to read data but there is no data to read...");
                     noData = true;
                     attempts++;
 
                     // disconnect the client if we cant read data.
                     if (attempts > 4)
                     {
-                        Logger.Log(Logger.LogLevel.Info, "Attempted to read data, but attempts maxed out.");
+                        Logger.LogInt(Logger.LogLevel.Info, "Attempted to read data, but attempts maxed out.");
                         client.Dispose();
                         return;
                     }

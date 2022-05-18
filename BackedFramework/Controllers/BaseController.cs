@@ -18,7 +18,7 @@ namespace BackedFramework.Controllers
         /// </summary>
         public BaseController()
         {
-            Logger.Log(Logger.LogLevel.Debug, "Base Controller Constructed :)");
+            Logger.LogInt(Logger.LogLevel.Debug, "Base Controller Constructed :)");
             ResponseContext.OnRequestFinished += OnRequestFinished;
         }
 
