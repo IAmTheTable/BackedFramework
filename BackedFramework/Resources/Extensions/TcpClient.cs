@@ -51,6 +51,10 @@ namespace BackedFramework.Resources.Extensions
         {
             // allocate the buffer
             byte[] buffer = new byte[amt];
+
+            while (Client.Available < amt)
+                Thread.Sleep(50);
+
             // start reading from the stream
             var result = base.GetStream().BeginRead(buffer, 0, (int)amt, _callback, null);
 
@@ -69,6 +73,27 @@ namespace BackedFramework.Resources.Extensions
                     LastRequest = DateTime.Now;
                     callback.Invoke(buffer); // send data back to caller.
                 }
+                else if (amountRecieved < buffer.Length)
+                {
+                    Logging.Logger.Log(Logging.Logger.LogLevel.Warning, "Recieved less data than requested...");
+                    LastRequest = DateTime.Now;
+
+                    ReadData(amt - amountRecieved, (byte[] buff) =>
+                    {
+                        buff.CopyTo(buffer, amountRecieved);
+                        Logging.Logger.Log(Logging.Logger.LogLevel.Debug, "Read the remaining data?");
+                        if(Client.Available == 0)
+                        {
+                            Logging.Logger.Log(Logging.Logger.LogLevel.Debug, "Confirmed all data!");
+                            callback.Invoke(buffer);
+                        }
+                    });
+                }
+                else if(amountRecieved > buffer.Length)
+                {
+                    Logging.Logger.Log(Logging.Logger.LogLevel.Debug, "Got more data than requested?");
+                    LastRequest = DateTime.Now;
+                }
             }
         }
 
@@ -79,6 +104,7 @@ namespace BackedFramework.Resources.Extensions
         /// <param name="data">Buffer of data to send</param>
         /// <param name="offset">Offset index to start sending data.</param>
         /// <param name="count">The amount of data(in bytes) to send.</param>
+        /// <param name="cancellationToken">A cancellationToken that can be used.</param>
         /// <returns>None</returns>
         public void WriteAsync(byte[] data, long offset = 0, long count = 0, CancellationToken cancellationToken = default)
         {

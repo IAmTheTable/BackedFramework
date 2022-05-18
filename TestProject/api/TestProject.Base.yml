@@ -8,8 +8,8 @@ items:
   - TestProject.Base.Func
   - TestProject.Base.ImageRequest
   - TestProject.Base.Index(System.String)
+  - TestProject.Base.Pos2t
   - TestProject.Base.Post
-  - TestProject.Base.Post(System.String)
   langs:
   - csharp
   - vb
@@ -147,25 +147,25 @@ items:
   - public
   modifiers.vb:
   - Public
-- uid: TestProject.Base.Post(System.String)
-  commentId: M:TestProject.Base.Post(System.String)
-  id: Post(System.String)
+- uid: TestProject.Base.Pos2t
+  commentId: M:TestProject.Base.Pos2t
+  id: Pos2t
   parent: TestProject.Base
   langs:
   - csharp
   - vb
-  name: Post(String)
-  nameWithType: Base.Post(String)
-  fullName: TestProject.Base.Post(System.String)
+  name: Pos2t()
+  nameWithType: Base.Pos2t()
+  fullName: TestProject.Base.Pos2t()
   type: Method
   source:
     remote:
       path: TestProject/Program.cs
       branch: master
       repo: https://github.com/IAmTheTable/BackedFramework.git
-    id: Post
+    id: Pos2t
     path: Program.cs
-    startLine: 47
+    startLine: 48
   assemblies:
   - TestProject
   namespace: TestProject
@@ -173,15 +173,12 @@ items:
     content: >-
       [Route("/post", HTTPMethods.POST)]
 
-      public void Post(string data)
-    parameters:
-    - id: data
-      type: System.String
+      public void Pos2t()
     content.vb: >-
       <Route("/post", HTTPMethods.POST)>
 
-      Public Sub Post(data As String)
-  overload: TestProject.Base.Post*
+      Public Sub Pos2t
+  overload: TestProject.Base.Pos2t*
   attributes:
   - type: BackedFramework.Api.Routing.RouteAttribute
     ctor: BackedFramework.Api.Routing.RouteAttribute.#ctor(System.String,BackedFramework.Resources.HTTP.HTTPMethods)
@@ -212,7 +209,7 @@ items:
       repo: https://github.com/IAmTheTable/BackedFramework.git
     id: ImageRequest
     path: Program.cs
-    startLine: 55
+    startLine: 56
   assemblies:
   - TestProject
   namespace: TestProject
@@ -256,7 +253,7 @@ items:
       repo: https://github.com/IAmTheTable/BackedFramework.git
     id: Func
     path: Program.cs
-    startLine: 62
+    startLine: 63
   assemblies:
   - TestProject
   namespace: TestProject
@@ -655,6 +652,11 @@ references:
   name: Post
   nameWithType: Base.Post
   fullName: TestProject.Base.Post
+- uid: TestProject.Base.Pos2t*
+  commentId: Overload:TestProject.Base.Pos2t
+  name: Pos2t
+  nameWithType: Base.Pos2t
+  fullName: TestProject.Base.Pos2t
 - uid: TestProject.Base.ImageRequest*
   commentId: Overload:TestProject.Base.ImageRequest
   name: ImageRequest

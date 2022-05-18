@@ -14,6 +14,10 @@ using BackedFramework.Resources.Extensions;
 
 namespace BackedFramework.Server
 {
+    /// <summary>
+    /// The backbone of the entire server.
+    /// Handles the connections and routing indirectly.
+    /// </summary>
     public class BackedServer
     {
         /// <summary>
@@ -100,6 +104,11 @@ namespace BackedFramework.Server
             Logger.Log(Logger.LogLevel.Debug, "Dumped all logs");
         }
 
+        /// <summary>
+        /// Configure the server and initialize its components.
+        /// </summary>
+        /// <param name="config">The <see cref="BackedConfig"/>config to initialize the server with.</param>
+        /// <returns>An instance of the <see cref="BackedServer"/>BackedServer.</returns>
         public static BackedServer Initialize(BackedConfig config) => new(config);
 
         /// <summary>
@@ -107,11 +116,6 @@ namespace BackedFramework.Server
         /// </summary>
         private void ConfigureServer()
         {
-            /*
-             * TODO: MAKE SURE TO CONFIGURE ALL THE SERVER EXTENSIONS
-             * EX; ROUTE MANAGER, CONNECTION MANAGER, THREAD MANAGER, ETC
-             */
-
             // configure the thread pool to use the number of threads specified in the config
             ThreadPool.SetMaxThreads(this.Config.MaxThreads, this.Config.MaxThreads);
 
@@ -215,34 +219,31 @@ namespace BackedFramework.Server
                 // the index of the first set of /r/n,
                 var index = data.ToList().IndexOf(0xD);
 
-                bool tobreak = false;
-
                 // read until we hit our series of /r/n/r/n/r/n/r/n
                 // or until we read 1024 bytes, because a header should not be longer than 1024 bytes
-                while (true || !tobreak)
+                while (index < 1024)
                 {
                     // read until the 4 sets of /r/n are present.
                     // should be exactly as follows: "/r/n/r/n/r/n/r/n"
                     if (data[index] == 0xD && data[index + 1] == 0xA && // first set
-                        data[index + 2] == 0xD && data[index + 3] == 0xA && // second set
-                         data[index + 4] == 0xD && data[index + 5] == 0xA && // third set
-                          data[index + 6] == 0xD && data[index + 7] == 0xA) // fourth set
+                        data[index + 2] == 0xD && data[index + 3] == 0xA)
                         break;
-
-                    // make sure to break after 1024 indexes because an HTTP header should not be more than 1024 bytes
-                    if (index > 1024)
-                        tobreak = true;
 
                     // set our index with the next set of /r
                     index = data.ToList().IndexOf(0xD, index + 1);
+                    if (index == -1)
+                    {
+                        //todo: drop the connection and flush data because the request is invalid.
+                        throw new Exception("Index out of range...");
+                    }
                 }
 
                 // store the header in the buffer so we know how much data is in the packet...
                 List<byte> buffer = data.Take(index).ToList();
-                // todo: parse the header and retrive the body size on post requests especially for images and such that are over 100k bytes.
 
                 // partially parse the header...
-                using HTTPParser parser = new(Encoding.UTF8.GetString(buffer.ToArray()));
+                string val = Encoding.UTF8.GetString(buffer.ToArray());
+                using HTTPParser parser = new(val);
 
                 // get the content length header and find out how much data we need to read.
                 if (parser.Headers.ContainsKey("Content-Length"))
@@ -252,8 +253,8 @@ namespace BackedFramework.Server
 
                     // since we "read 1024 bytes, we need to subtract the index
                     // because the index is the ending index of data we read.
-                    // then we add 4 because we skip the /r/n/r/n
-                    // so now there is only /r/n/r/n then the packet data
+                    // then we add 2 because we skip the /r/n
+                    // so now there is only /r/n then the packet data
                     // after that, we subtract this value from the content-length
                     // and that is the remaining bytes to read.
                     var remainingDataToRead = Convert.ToInt64(len) - (1024 - (index + 4));
@@ -272,6 +273,10 @@ namespace BackedFramework.Server
                         // finally invoke the request.
                         ClientRequest.Invoke(client, parser);
                     });
+                }
+                else
+                {
+                    throw new Exception("Client is missing the content-length header.");
                 }
             });
 

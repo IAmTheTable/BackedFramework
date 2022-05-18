@@ -9,7 +9,13 @@ namespace BackedFramework.Resources.HTTP
     /// </summary>
     public class ResponseContext : ResponseBase, IDisposable
     {
+        /// <summary>
+        /// An event that is fired when a request is finished.
+        /// </summary>
         public static event Action OnRequestFinished;
+        /// <summary>
+        /// The amount of responseContext instances.
+        /// </summary>
         private static int _instanceCount = 0;
         private readonly CancellationToken _cancellationToken = new();
         private RequestContext _requestContext;
@@ -39,13 +45,15 @@ namespace BackedFramework.Resources.HTTP
         /// <summary>
         /// A function to set the client, easier than constructing... might change later...
         /// </summary>
-        /// <param name="client">Client instance</param>
-        internal void DefineClient(TcpClient clientIp) => this._client = clientIp;
+        /// <param name="clientInstance">Client instance</param>
+        internal void DefineClient(TcpClient clientInstance) => this._client = clientInstance;
 
         /// <summary>
         /// Send a 3XX redirect type request to the client.
         /// </summary>
         /// <param name="location">The url the client will redirect to.</param>
+        /// <param name="code">The HTTP redirect code, must be a 3XX code or it will throw an an exception.</param>
+        /// <exception cref="ArgumentException">Thrown if the code is not a 3XX code.</exception>
         /// <remarks>Ex: https://youtube.com</remarks>
         public void Redirect(string location, HttpStatusCode code = HttpStatusCode.Redirect)
         {
@@ -184,7 +192,6 @@ namespace BackedFramework.Resources.HTTP
         /// <summary>
         /// Write the response to the client.
         /// </summary>
-        /// <param name="content">The string content to send.</param>
         public void FinishRequest()
         {
             // write data to client
@@ -218,6 +225,9 @@ namespace BackedFramework.Resources.HTTP
             base.Headers.Add("Set-Cookie", cookie.ToString());
         }
 
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
         public new void Dispose()
         {
             if (OnRequestFinished is not null)

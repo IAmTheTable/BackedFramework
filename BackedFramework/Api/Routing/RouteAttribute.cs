@@ -7,6 +7,9 @@ using BackedFramework.Resources.HTTP;
 
 namespace BackedFramework.Api.Routing
 {
+    /// <summary>
+    /// A route attribute to work in conjunction with the <see cref="RouteManager"/> class.
+    /// </summary>
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
     public class RouteAttribute : Attribute
     {
@@ -25,6 +28,11 @@ namespace BackedFramework.Api.Routing
         /// </summary>
         public HTTPMethods HTTPMethod { get; private set; }
 
+        /// <summary>
+        /// Construct a new route attribute defining at a url path and http method.
+        /// </summary>
+        /// <param name="targetRoute">The url that will be routed</param>
+        /// <param name="method">The http method used to accept the request.</param>
         public RouteAttribute(string targetRoute, HTTPMethods method)
         {
             this.Route = targetRoute;

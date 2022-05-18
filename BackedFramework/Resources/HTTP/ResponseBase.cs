@@ -6,7 +6,6 @@ namespace BackedFramework.Resources.HTTP
     /// </summary>
     public class ResponseBase : IDisposable
     {
-        private MemoryStream _dataStreamB = new();
         private readonly HTTPParser _parser;
         internal ResponseBase(HTTPParser parser) { this._parser = parser; }
 
@@ -43,17 +42,20 @@ namespace BackedFramework.Resources.HTTP
             set => this._parser.Headers = value;
         }
 
-        internal void SetStream(MemoryStream ms) => _dataStreamB = ms;
-
-        public MemoryStream ToStream()
-        {
-            _dataStreamB.Write(this.ToBytes());
-            return _dataStreamB;
-        }
-        
+        /// <summary>
+        /// Convert the response to a byte array.
+        /// </summary>
+        /// <returns>A byte array containing the data.</returns>
         public byte[] ToBytes() => _parser.ToBytes();
+        /// <summary>
+        /// Convert the response to a valid HTTP packet.
+        /// </summary>
+        /// <returns>A string representation of the HTTP packet.</returns>
         public override string ToString() => this._parser.ToString();
 
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
         public void Dispose()
         {
             Logger.Log(Logger.LogLevel.Debug, "Disposing Response Base");

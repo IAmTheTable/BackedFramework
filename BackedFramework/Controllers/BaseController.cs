@@ -13,6 +13,9 @@ namespace BackedFramework.Controllers
     /// </summary>
     public partial class BaseController : IDisposable
     {
+        /// <summary>
+        /// Default constructor.
+        /// </summary>
         public BaseController()
         {
             Logger.Log(Logger.LogLevel.Debug, "Base Controller Constructed :)");
@@ -36,6 +39,9 @@ namespace BackedFramework.Controllers
         /// <seealso cref="RequestBase"/>
         public RequestContext Request { get; internal set; }
 
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
         public void Dispose()
         {
             Console.WriteLine("Base controller has been disposed.");

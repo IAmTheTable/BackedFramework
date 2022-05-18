@@ -11,9 +11,16 @@ namespace BackedFramework.Resources.Exceptions
     /// </summary>
     public class MultiInstanceException : Exception
     {
+        /// <summary>
+        /// Default constructor.
+        /// </summary>
         public MultiInstanceException()
         {
         }
+        /// <summary>
+        /// Constructor with a message.
+        /// </summary>
+        /// <param name="message">Message of the exception.</param>
         public MultiInstanceException(string message) : base(message)
         {
         }

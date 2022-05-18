@@ -41,15 +41,16 @@ namespace TestProject
         [Route("/post", BackedFramework.Resources.HTTP.HTTPMethods.GET)]
         public void Post()
         {
-            base.Response.Write($"<script>alert('{File.ReadAllText(BackedServer.Instance.Config.RootDirectory + "/dynamic.txt")}');</script>");
+            base.Response.Redirect("https://youtube.com");
+            //base.Response.Write($"<script>alert('{File.ReadAllText(BackedServer.Instance.Config.RootDirectory + "/dynamic.txt")}');</script>");
             base.Response.FinishRequest();
         }
 
         [Route("/post", BackedFramework.Resources.HTTP.HTTPMethods.POST)]
-        public void Post(string data)
+        public void Pos2t()
         {
-            
-            File.WriteAllBytes(BackedServer.Instance.Config.RootDirectory + "/image.png", base.Request.);
+            Console.WriteLine($"Client wrote file at: {base.Request.QueryParameters.First().Value}");
+            File.WriteAllBytes(BackedServer.Instance.Config.RootDirectory + $"/{base.Request.QueryParameters["fileName"]}", base.Request.PostData);
             base.Response.Redirect("post");
         }
 

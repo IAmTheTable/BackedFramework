@@ -71,7 +71,9 @@ namespace BackedFramework.Resources.HTTP
                 return Enum.Parse<HTTPMethods>(this._parser.Method);
             }
         }
-
+        /// <summary>
+        /// Key value pairs for form data in basic POST requests.
+        /// </summary>
         public Dictionary<string, string> FormData
         {
             get
@@ -91,6 +93,9 @@ namespace BackedFramework.Resources.HTTP
             }
         }
 
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
         public void Dispose()
         {
             Logger.Log(Logger.LogLevel.Debug, "Disposing Request Context");

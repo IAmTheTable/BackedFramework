@@ -10,6 +10,7 @@ items:
   - BackedFramework.Resources.HTTP.RequestContext.IsQueried
   - BackedFramework.Resources.HTTP.RequestContext.Method
   - BackedFramework.Resources.HTTP.RequestContext.Path
+  - BackedFramework.Resources.HTTP.RequestContext.PostData
   - BackedFramework.Resources.HTTP.RequestContext.QueryParameters
   - BackedFramework.Resources.HTTP.RequestContext.RequestHeaders
   langs:
@@ -92,6 +93,43 @@ items:
   modifiers.vb:
   - Public
   - ReadOnly
+- uid: BackedFramework.Resources.HTTP.RequestContext.PostData
+  commentId: P:BackedFramework.Resources.HTTP.RequestContext.PostData
+  id: PostData
+  parent: BackedFramework.Resources.HTTP.RequestContext
+  langs:
+  - csharp
+  - vb
+  name: PostData
+  nameWithType: RequestContext.PostData
+  fullName: BackedFramework.Resources.HTTP.RequestContext.PostData
+  type: Property
+  source:
+    remote:
+      path: BackedFramework/Resources/HTTP/RequestContext.cs
+      branch: master
+      repo: https://github.com/IAmTheTable/BackedFramework.git
+    id: PostData
+    path: ../BackedFramework/Resources/HTTP/RequestContext.cs
+    startLine: 33
+  assemblies:
+  - BackedFramework
+  namespace: BackedFramework.Resources.HTTP
+  summary: "\nBytes of the post body, will not always be set...\n"
+  example: []
+  syntax:
+    content: public byte[] PostData { get; }
+    parameters: []
+    return:
+      type: System.Byte[]
+    content.vb: Public ReadOnly Property PostData As Byte()
+  overload: BackedFramework.Resources.HTTP.RequestContext.PostData*
+  modifiers.csharp:
+  - public
+  - get
+  modifiers.vb:
+  - Public
+  - ReadOnly
 - uid: BackedFramework.Resources.HTTP.RequestContext.QueryParameters
   commentId: P:BackedFramework.Resources.HTTP.RequestContext.QueryParameters
   id: QueryParameters
@@ -110,7 +148,7 @@ items:
       repo: https://github.com/IAmTheTable/BackedFramework.git
     id: QueryParameters
     path: ../BackedFramework/Resources/HTTP/RequestContext.cs
-    startLine: 33
+    startLine: 44
   assemblies:
   - BackedFramework
   namespace: BackedFramework.Resources.HTTP
@@ -147,7 +185,7 @@ items:
       repo: https://github.com/IAmTheTable/BackedFramework.git
     id: Path
     path: ../BackedFramework/Resources/HTTP/RequestContext.cs
-    startLine: 44
+    startLine: 55
   assemblies:
   - BackedFramework
   namespace: BackedFramework.Resources.HTTP
@@ -184,7 +222,7 @@ items:
       repo: https://github.com/IAmTheTable/BackedFramework.git
     id: Method
     path: ../BackedFramework/Resources/HTTP/RequestContext.cs
-    startLine: 55
+    startLine: 66
   assemblies:
   - BackedFramework
   namespace: BackedFramework.Resources.HTTP
@@ -221,7 +259,7 @@ items:
       repo: https://github.com/IAmTheTable/BackedFramework.git
     id: FormData
     path: ../BackedFramework/Resources/HTTP/RequestContext.cs
-    startLine: 63
+    startLine: 74
   assemblies:
   - BackedFramework
   namespace: BackedFramework.Resources.HTTP
@@ -256,7 +294,7 @@ items:
       repo: https://github.com/IAmTheTable/BackedFramework.git
     id: RequestHeaders
     path: ../BackedFramework/Resources/HTTP/RequestContext.cs
-    startLine: 74
+    startLine: 85
   assemblies:
   - BackedFramework
   namespace: BackedFramework.Resources.HTTP
@@ -293,7 +331,7 @@ items:
       repo: https://github.com/IAmTheTable/BackedFramework.git
     id: Dispose
     path: ../BackedFramework/Resources/HTTP/RequestContext.cs
-    startLine: 82
+    startLine: 93
   assemblies:
   - BackedFramework
   namespace: BackedFramework.Resources.HTTP
@@ -624,6 +662,37 @@ references:
   name: Boolean
   nameWithType: Boolean
   fullName: System.Boolean
+- uid: BackedFramework.Resources.HTTP.RequestContext.PostData*
+  commentId: Overload:BackedFramework.Resources.HTTP.RequestContext.PostData
+  name: PostData
+  nameWithType: RequestContext.PostData
+  fullName: BackedFramework.Resources.HTTP.RequestContext.PostData
+- uid: System.Byte[]
+  isExternal: true
+  name: Byte[]
+  nameWithType: Byte[]
+  fullName: System.Byte[]
+  nameWithType.vb: Byte()
+  fullName.vb: System.Byte()
+  name.vb: Byte()
+  spec.csharp:
+  - uid: System.Byte
+    name: Byte
+    nameWithType: Byte
+    fullName: System.Byte
+    isExternal: true
+  - name: '[]'
+    nameWithType: '[]'
+    fullName: '[]'
+  spec.vb:
+  - uid: System.Byte
+    name: Byte
+    nameWithType: Byte
+    fullName: System.Byte
+    isExternal: true
+  - name: ()
+    nameWithType: ()
+    fullName: ()
 - uid: BackedFramework.Resources.HTTP.RequestContext.QueryParameters*
   commentId: Overload:BackedFramework.Resources.HTTP.RequestContext.QueryParameters
   name: QueryParameters

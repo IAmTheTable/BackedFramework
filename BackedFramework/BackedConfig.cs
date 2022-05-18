@@ -69,8 +69,14 @@
         /// </summary>
         internal bool UnlimitedThreads { get { return MaxThreads == 0; } }
 
+        /// <summary>
+        /// The name of the server that will be displayed on the client.
+        /// </summary>
         public string ServerName { get; set; } = $"BackedServer {Environment.Version}";
 
+        /// <summary>
+        /// Default constructor for the configuration class.
+        /// </summary>
         public BackedConfig() { }
 
         /// <summary>

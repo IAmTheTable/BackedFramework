@@ -49,7 +49,7 @@ namespace BackedFramework.Resources.HTTP
 
 
             // extract query parameters if they exist
-            if (this.Url.Contains("?") && this.Url.IndexOf("?") < this.Url.Length - 1)
+            if (this.Url.Contains('?') && this.Url.IndexOf('?') < this.Url.Length - 1)
             {
                 this.IsQueried = true;
 
@@ -89,13 +89,13 @@ namespace BackedFramework.Resources.HTTP
             }
             else if (this.Method == "POST")
             {
-                if (!requireHeader(headers, "Content-Length"))
+                if (!RequireHeader(headers, "Content-Length"))
                 {
                     Logger.Log(Logger.LogLevel.Error, "Failed parse HTTP packet, missing Content-Length header.");
                     return;
                 }
 
-                if (!requireHeader(headers, "Content-Type"))
+                if (!RequireHeader(headers, "Content-Type"))
                 {
                     Logger.Log(Logger.LogLevel.Error, "Failed parse HTTP packet, missing Content-Type header.");
                     return;
@@ -105,23 +105,23 @@ namespace BackedFramework.Resources.HTTP
 
                 if (contentType == "application/x-www-form-urlencoded")
                 {
-                    parseUrlEncodedBody(headers);
+                    ParseUrlEncodedBody(headers);
                     return;
                 }
                 else if (contentType.Contains("multipart/form-data"))
                 {
-                    parseMultipartBody(headers);
+                    ParseMultipartBody(headers);
                     return;
                 }
                 else
                 {
-                    parseNormalBody(headers);
+                    ParseNormalBody(headers);
                 }
                 Logger.Log(Logger.LogLevel.Info, "Hi how are ya.");
             }
         }
 
-        private void parseNormalBody(List<string> headers)
+        private void ParseNormalBody(List<string> headers)
         {
             int i = 0;
             // read headers until it reaches the "null" header, which is usually the line before the body.
@@ -143,9 +143,9 @@ namespace BackedFramework.Resources.HTTP
 
             if (this.Body != "")
             {
-                this.Body = this.Body.Substring(0, this.Body.Length - 1);
+                this.Body = this.Body[0..^1];
                 int lineCount = this.Body.Split('\n').Length - 1;
-                if ((this.Body.Count() + lineCount).ToString() != this.Headers["Content-Length"])
+                if ((this.Body.Length + lineCount).ToString() != this.Headers["Content-Length"])
                 {
                     Logger.Log(Logger.LogLevel.Info, "Body length does not match header length.");
                 }
@@ -158,13 +158,13 @@ namespace BackedFramework.Resources.HTTP
         /// </summary>
         /// <param name="input">Input string to decode</param>
         /// <returns>The HTML decoded string.</returns>
-        private string HtmlDecode(string input) => System.Net.WebUtility.UrlDecode(input);
+        private static string HtmlDecode(string input) => System.Net.WebUtility.UrlDecode(input);
 
         /// <summary>
         /// parse multipart form data post requests via remaining headers.
         /// </summary>
         /// <param name="headers">List of headers to use for parsing...</param>
-        private void parseMultipartBody(List<string> headers)
+        private void ParseMultipartBody(List<string> headers)
         {
             int i = 0;
 
@@ -234,7 +234,7 @@ namespace BackedFramework.Resources.HTTP
         /// Parse url encoded form data post requests via remaining headers.
         /// </summary>
         /// <param name="headers">The remaining headers to use when parsing.</param>
-        private void parseUrlEncodedBody(List<string> headers)
+        private void ParseUrlEncodedBody(List<string> headers)
         {
             int i = 0;
             // read headers until it reaches the "null" header, which is usually the line before the body.
@@ -266,141 +266,7 @@ namespace BackedFramework.Resources.HTTP
         /// </summary>
         /// <param name="headers">A list of headers.</param>
         /// <param name="header">The header to check for, not case sensitive.</param>
-        private bool requireHeader(IEnumerable<string> headers, string header) => headers.Any(x => x.ToLower().Split(':')[0] == header.ToLower());
-
-        internal void _HTTPParser(string Input)
-        {
-            if (string.IsNullOrWhiteSpace(Input))
-            {
-                Logger.Log(Logger.LogLevel.Error, "Failed parse HTTP packet, input is null or empty.");
-                return;
-            }
-
-            // remove all /r Format from Input
-            Input = Input.Replace("\r", "");
-            // convert each line as a "header"
-            var lines = Input.Split('\n');
-            this.Method = lines[0].Split(' ')[0]; // extract the HTTP methods
-            this.Url = System.Web.HttpUtility.UrlDecode(lines[0].Split(' ')[1]);  // extract the url 
-            this.Version = lines[0].Split(' ')[2]; // extract the HTTP version
-
-            // extract query parameters if they exist
-            if (this.Url.Contains("?") && this.Url.IndexOf("?") < this.Url.Length - 1)
-            {
-                this.IsQueried = true;
-
-                // split the queried string...
-                var query = Url.Split('?')[1];
-                var query_params = query.Split('&');
-
-                // iterate the queried strings...
-                foreach (var param in query_params)
-                {
-                    // retrieve the key value pairs
-
-                    if (param.Split('=').Length < 2)
-                    {
-                        this.QueryParameters.Add(param.Split('=')[0], "");
-                        continue;
-                    }
-                    // get the key value pairs
-                    var key = param.Split('=')[0];
-                    var value = param.Split('=')[1];
-
-                    // add the values to the query parameters dictionary
-                    QueryParameters.Add(key, value);
-                }
-
-                // fix the url because it still contians the url parameters
-                this.Url = Url.Split('?')[0];
-            }
-
-            var headers = lines.Skip(1).ToList(); // skip the first line
-
-            // flags for reading form based requests
-            bool formDataMode = false;
-            bool waitForFormData = false;
-            bool dataMode = false;
-            bool formUrlEnc = false;
-            // used for temporarily storing a form Key name
-            string formKeyName = "";
-            // current index of headers
-            int i = 0;
-
-            foreach (var header in headers)
-            {
-                i++;
-                // check if the line is '("")' (empty)
-                if (string.IsNullOrEmpty(header))
-                    continue;
-                // extract form data from the request, using the boundary specified in the content-type header
-                if (!string.IsNullOrEmpty(this.Boundary) && dataMode)
-                {
-                    if (header == this.Boundary)
-                    {
-                        formDataMode = true;
-                        continue;
-                    }
-                    else if (header == this.Boundary + "--")
-                    {
-                        formDataMode = false;
-                        continue;
-                    }
-
-                    if (waitForFormData)
-                    {
-                        FormData.Add(formKeyName, header);
-                        waitForFormData = false;
-                        continue;
-                    }
-
-                    var _key = header.Contains(':') ? header.Split(':')[0] : header;
-                    var _value = header.Contains(':') ? header.Split(':')[1][1..] : "";
-
-                    if (_key == "Content-Disposition" && !waitForFormData)
-                    {
-                        if (_value.Split(";")[0] == "form-data")
-                        {
-                            formKeyName = _value.Split("=")[1];
-                            waitForFormData = true;
-                        }
-                    }
-                }
-                // extract url form encoded parameters
-                if (!header.Contains(':') && formUrlEnc)
-                {
-                    var formValues = header.Split('&');
-                    foreach (var formValue in formValues)
-                    {
-                        var _key = formValue.Split('=')[0];
-                        var _value = formValue.Split('=')[1][1..];
-                        FormData.Add(_key, _value);
-                    }
-                    continue;
-                }
-                // extract headers
-                if (!formDataMode && !dataMode)
-                {
-                    var key = header.Split(':')[0]; // header name
-                    var value = header.Split(':')[1][1..]; // header value
-                                                           // Content-Type: application/html
-                                                           // key^            Value^
-
-                    // compare content type or content length, each useful for form data replies and whatnot
-                    if (key == "Content-Type")
-                    {
-                        if (value.StartsWith("multipart/form-data"))
-                            this.Boundary = value.Split('=')[1]; // extract the boundary from the HTTP request
-                        else if (value.StartsWith("application/x-www-form-urlencoded"))
-                            formUrlEnc = true; // enable form url encoded mode
-                    }
-                    else if (key == "Content-Length")
-                        dataMode = true;
-
-                    Headers.Add(key, value);
-                }
-            }
-        }
+        private bool RequireHeader(IEnumerable<string> headers, string header) => headers.Any(x => x.ToLower().Split(':')[0] == header.ToLower());
 
         /// <summary>
         /// If the request has query parameters, this is true...
