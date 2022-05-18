@@ -114,6 +114,8 @@ namespace BackedFramework.Api.Routing
 
                 // create the controller
                 BaseController controller = null;
+                // create a basic caching system for controllers so we dont construct 
+                // an un-necessary amount of controllers for no reason.
                 if (!_routingInstances.ContainsKey(targetRouteClass))
                 {
                     controller = Activator.CreateInstance(targetRouteClass) as BaseController;

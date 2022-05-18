@@ -85,7 +85,9 @@ namespace BackedFramework.Resources.HTTP
 
             if (this.Method == "GET")
             {
-                // parse the headers
+                headers.RemoveAll(x => x == "");// clear null entries
+                foreach (var header in headers)
+                    this.Headers.Add(header.Split(": ")[0], header.Split(": ")[1]);
             }
             else if (this.Method == "POST")
             {
@@ -117,7 +119,6 @@ namespace BackedFramework.Resources.HTTP
                 {
                     ParseNormalBody(headers);
                 }
-                Logger.Log(Logger.LogLevel.Info, "Hi how are ya.");
             }
         }
 

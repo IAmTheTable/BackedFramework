@@ -107,8 +107,8 @@ namespace BackedFramework.Server
         /// <summary>
         /// Configure the server and initialize its components.
         /// </summary>
-        /// <param name="config">The <see cref="BackedConfig"/>config to initialize the server with.</param>
-        /// <returns>An instance of the <see cref="BackedServer"/>BackedServer.</returns>
+        /// <param name="config">The <see cref="BackedConfig"/> to initialize the server with.</param>
+        /// <returns>An instance of the <see cref="BackedServer"/></returns>
         public static BackedServer Initialize(BackedConfig config) => new(config);
 
         /// <summary>
@@ -118,7 +118,6 @@ namespace BackedFramework.Server
         {
             // configure the thread pool to use the number of threads specified in the config
             ThreadPool.SetMaxThreads(this.Config.MaxThreads, this.Config.MaxThreads);
-
             // will be automatically disposed upon leaving the current scope
             using var x = new RouteManager();
 
@@ -141,8 +140,8 @@ namespace BackedFramework.Server
                 {
                     // continuously accept connections and handle them.
                     var client = this._server.EndAcceptTcpClient(ar);
+                    this._server.BeginAcceptTcpClient(OnClientRequestConnection);
                     ClientConnect.Invoke(client);
-                    this._server.BeginAcceptTcpClient(OnClientRequestConnection, null);
                 }
                 catch (Exception e)
                 {
@@ -214,14 +213,33 @@ namespace BackedFramework.Server
 
             // notes:
             // there are 4 sets of /r/n in the request, /r/n /r/n /r/n /r/n
-            client.ReadData(1024, (byte[] data) =>
+            int attempts = 0;
+        readData:
+            bool noData = false;
+            client.ReadData((byte[] data) =>
             {
+                if (data.Length == 0)
+                {
+                    Logger.Log(Logger.LogLevel.Warning, "Attempted to read data but there is no data to read...");
+                    noData = true;
+                    attempts++;
+
+                    // disconnect the client if we cant read data.
+                    if (attempts > 4)
+                    {
+                        Logger.Log(Logger.LogLevel.Info, "Attempted to read data, but attempts maxed out.");
+                        client.Dispose();
+                        return;
+                    }
+                    
+                    return;
+                }
                 // the index of the first set of /r/n,
                 var index = data.ToList().IndexOf(0xD);
 
                 // read until we hit our series of /r/n/r/n/r/n/r/n
                 // or until we read 1024 bytes, because a header should not be longer than 1024 bytes
-                while (index < 1024)
+                while (index < data.Length)
                 {
                     // read until the 4 sets of /r/n are present.
                     // should be exactly as follows: "/r/n/r/n/r/n/r/n"
@@ -245,40 +263,58 @@ namespace BackedFramework.Server
                 string val = Encoding.UTF8.GetString(buffer.ToArray());
                 using HTTPParser parser = new(val);
 
-                // get the content length header and find out how much data we need to read.
-                if (parser.Headers.ContainsKey("Content-Length"))
+                if (parser.Method == "POST")
                 {
-                    // store that data
-                    var len = parser.Headers["Content-Length"];
 
-                    // since we "read 1024 bytes, we need to subtract the index
-                    // because the index is the ending index of data we read.
-                    // then we add 2 because we skip the /r/n
-                    // so now there is only /r/n then the packet data
-                    // after that, we subtract this value from the content-length
-                    // and that is the remaining bytes to read.
-                    var remainingDataToRead = Convert.ToInt64(len) - (1024 - (index + 4));
-
-                    // read all the remaining data...
-                    client.ReadData(remainingDataToRead, (byte[] c_buff) =>
+                    // get the content length header and find out how much data we need to read.
+                    if (parser.Headers.ContainsKey("Content-Length"))
                     {
-                        // a temporary holder for our data.
-                        List<byte> temp = new();
-                        // add the remaining bytes of the previous packet we recieved and add it to our list.
-                        temp.AddRange(data.TakeLast(data.Length - index - 4));
-                        temp.AddRange(c_buff);// concat the remaining data from the current packet to the previous packet.
+                        // store that data
+                        var len = parser.Headers["Content-Length"];
 
-                        // set the post data.
-                        parser.PostData = temp.ToArray();
-                        // finally invoke the request.
-                        ClientRequest.Invoke(client, parser);
-                    });
+                        // since we "read data.Length bytes, we need to subtract the index
+                        // because the index is the ending index of data we read.
+                        // then we add 2 because we skip the /r/n
+                        // so now there is only /r/n then the packet data
+                        // after that, we subtract this value from the content-length
+                        // and that is the remaining bytes to read.
+                        var remainingDataToRead = Convert.ToInt64(len) - (data.Length - (index + 4));
+
+                        // read all the remaining data...
+                        client.ReadData(remainingDataToRead, (byte[] c_buff) =>
+                        {
+                            // a temporary holder for our data.
+                            List<byte> temp = new();
+                            // add the remaining bytes of the previous packet we recieved and add it to our list.
+                            temp.AddRange(data.TakeLast(data.Length - index - 4));
+                            temp.AddRange(c_buff);// concat the remaining data from the current packet to the previous packet.
+
+                            // set the post data.
+                            parser.PostData = temp.ToArray();
+                            // finally invoke the request.
+                            ClientRequest.Invoke(client, parser);
+                        });
+                    }
+                    else
+                    {
+                        throw new Exception("Client is missing the content-length header.");
+                    }
+                }
+                else if (parser.Method == "GET")
+                {
+                    val = Encoding.UTF8.GetString(data);
+                    // invoke the request.
+                    ClientRequest.Invoke(client, new(val));
                 }
                 else
                 {
                     throw new Exception("Client is missing the content-length header.");
                 }
             });
+
+            // since we didnt get data, read again.
+            if (noData)
+                goto readData;
 
         }
     }

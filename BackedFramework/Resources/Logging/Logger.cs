@@ -6,19 +6,48 @@ using System.Threading.Tasks;
 
 namespace BackedFramework.Resources.Logging
 {
-    internal static class Logger
+    /// <summary>
+    /// A basic logging utility class.
+    /// </summary>
+    public static class Logger
     {
+        /// <summary>
+        /// An event that is raised when a message is logged.
+        /// </summary>
+        public static Action<LogLevel, string> OnLog;
         private static readonly Dictionary<LogLevel, string[]> _logs = new();
-        internal enum LogLevel
+        /// <summary>
+        /// The level of the log from the most severe to nothing.
+        /// </summary>
+        public enum LogLevel
         {
+            /// <summary>
+            /// Do NOT use, this is meant for internal use only.
+            /// </summary>
             None,
+            /// <summary>
+            /// Show debug messages. (Extremely spammy)
+            /// </summary>
             Debug,
+            /// <summary>
+            /// Show informational messages. (Spammy)
+            /// </summary>
             Info,
+            /// <summary>
+            /// Show warning messages.
+            /// </summary>
             Warning,
+            /// <summary>
+            /// Show error messages.
+            /// </summary>
             Error,
+            /// <summary>
+            /// Show fatal messages.
+            /// Used for near application crash messages...
+            /// </summary>
             Fatal
         }
-        internal static void Log(LogLevel level, params string[] args)
+        public static void Log(LogLevel level, params string[] args)
         {
             Console.WriteLine($"[{Enum.GetName(level)}] [{DateTime.Now:G}] {string.Join(" ", args)}");
 
@@ -46,7 +75,7 @@ namespace BackedFramework.Resources.Logging
 
             for (int i = 0; i < logs.Count(); i++)
                 logLists.AddRange(logs.ElementAt(i));
-            
+
             return logLists;
         }
     }

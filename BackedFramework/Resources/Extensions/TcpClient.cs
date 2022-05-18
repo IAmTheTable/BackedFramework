@@ -15,7 +15,7 @@ namespace BackedFramework.Resources.Extensions
         /// A list of tasks that the client is currently running, used for waiting on disposal on the client.
         /// </summary>
         private readonly List<Task> _currentOperations = new();
-        
+
         public TcpClient() : base() { }
         public TcpClient(Socket s) : base()
         {
@@ -24,6 +24,9 @@ namespace BackedFramework.Resources.Extensions
 
         public void ReadData(Action<byte[]> callback)
         {
+            while (Available < 1)
+                Thread.Sleep(1);
+
             // allocate the buffer
             byte[] buffer = new byte[base.Available];
             // start reading from the stream
@@ -49,11 +52,17 @@ namespace BackedFramework.Resources.Extensions
 
         public void ReadData(long amt, Action<byte[]> callback)
         {
+            while (Available < 1)
+                Thread.Sleep(1);
+
+            amt = amt > this.Available ? this.Available : amt;
             // allocate the buffer
             byte[] buffer = new byte[amt];
 
-            while (Client.Available < amt)
+            /*while (Client.Available < amt)
+            {
                 Thread.Sleep(50);
+            }*/
 
             // start reading from the stream
             var result = base.GetStream().BeginRead(buffer, 0, (int)amt, _callback, null);
@@ -82,14 +91,14 @@ namespace BackedFramework.Resources.Extensions
                     {
                         buff.CopyTo(buffer, amountRecieved);
                         Logging.Logger.Log(Logging.Logger.LogLevel.Debug, "Read the remaining data?");
-                        if(Client.Available == 0)
+                        if (Client.Available == 0)
                         {
                             Logging.Logger.Log(Logging.Logger.LogLevel.Debug, "Confirmed all data!");
                             callback.Invoke(buffer);
                         }
                     });
                 }
-                else if(amountRecieved > buffer.Length)
+                else if (amountRecieved > buffer.Length)
                 {
                     Logging.Logger.Log(Logging.Logger.LogLevel.Debug, "Got more data than requested?");
                     LastRequest = DateTime.Now;
@@ -139,10 +148,14 @@ namespace BackedFramework.Resources.Extensions
             {
                 LastRequest = DateTime.Now;
                 Logging.Logger.Log(Logging.Logger.LogLevel.Debug, "Finished writing data to the stream.");
-                base.GetStream().EndWrite(result);
+                try
+                {
+                    base.GetStream().EndWrite(result);
+                }
+                catch (ObjectDisposedException) { }
                 _isWriting = false;
             });
-            
+
             _currentOperations.Add(task);
         }
 
@@ -153,14 +166,14 @@ namespace BackedFramework.Resources.Extensions
             Logging.Logger.Log(Logging.Logger.LogLevel.Info, "Disposing TcpClient.");
 
             Task.WaitAll(_currentOperations.ToArray());
-            
-            if(this._isWriting)
+
+            if (this._isWriting)
             {
                 while (this._isWriting)
                     Task.Delay(1);
             }
 
-            base.Dispose();            
+            base.Dispose();
             Logging.Logger.Log(Logging.Logger.LogLevel.Info, "Finished Disposition.");
         }
     }
